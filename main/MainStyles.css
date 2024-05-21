@@ -29,11 +29,24 @@ header {
   margin-left: 10px;
 }
 
-.language a {
+.language {
+  margin-right: 10px;
+}
+
+.language select {
+  background-color: #003366;
   color: white;
+  border: none;
   font-size: 20px;
   text-decoration: none;
-  margin-right: 10px;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: 5px;
+  transition: background-color 0.5s ease;
+}
+
+.language select:hover {
+  background-color: #002244;
 }
 
 .mainbackground {
@@ -44,7 +57,7 @@ header {
 .mainbackground img {
   width: 100%;
   height: auto;
-  opacity : 0.4;
+  opacity: 0.4;
 }
 
 .buttons {
@@ -59,9 +72,9 @@ header {
 
 .buttons button {
   background-color: #003366;
-  border-style:solid;
+  border-style: solid;
   border-color: white;
-  border-width:2px;
+  border-width: 2px;
   border-radius: 20px;
   color: white;
   margin-top: 10px;
@@ -78,12 +91,12 @@ header {
 
 .notice {
   position: absolute;
-  display:  grid;
+  display: grid;
   grid-template-columns: 400px;
   top: 50%;
-  left:50%;
+  left: 50%;
   height: 500px;
-  transform: translate(0,-50%);
+  transform: translate(0, -50%);
   background-color: #EEEEEE;
   padding: 10px;
   border-radius: 5px;
@@ -103,4 +116,3 @@ header {
 .notice-content p {
   margin: 5px;
 }
-
