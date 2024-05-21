@@ -1,30 +1,30 @@
 {
-    "ko": {
-        "noticeTitle": "공지사항",
-        "noNotice": "공지사항이 없습니다.",
-        "noBus": "오늘 학교 통학버스 운행 안합니다.",
-        "reservationButton": "승차권 예매",
-        "infoButton": "내 정보"
-    },
-    "en": {
-        "noticeTitle": "Notice",
-        "noNotice": "No notices available.",
-        "noBus": "The school commuter bus will not operate today.",
-        "reservationButton": "Ticket Reservation",
-        "infoButton": "My Info"
-    },
-    "vi": {
-        "noticeTitle": "Thông báo",
-        "noNotice": "Không có thông báo.",
-        "noBus": "Xe buýt đưa đón của trường hôm nay không hoạt động.",
-        "reservationButton": "Đặt vé",
-        "infoButton": "Thông tin của tôi"
-    },
-    "zh": {
-        "noticeTitle": "公告",
-        "noNotice": "没有通知。",
-        "noBus": "今天学校通勤巴士停运。",
-        "reservationButton": "票务预订",
-        "infoButton": "我的信息"
-    }
+  "ko": {
+      "noticeTitle": "공지사항",
+      "noNotice": "공지사항이 없습니다.",
+      "noBus": "오늘 학교 통학버스 운행 안합니다.",
+      "reservationButton": "승차권 예매",
+      "infoButton": "내 정보"
+  },
+  "en": {
+      "noticeTitle": "Notice",
+      "noNotice": "No notices available.",
+      "noBus": "The school commuter bus will not operate today.",
+      "reservationButton": "Ticket Reservation",
+      "infoButton": "My Info"
+  },
+  "vi": {
+      "noticeTitle": "Thông báo",
+      "noNotice": "Không có thông báo.",
+      "noBus": "Xe buýt đưa đón của trường hôm nay không hoạt động.",
+      "reservationButton": "Đặt vé",
+      "infoButton": "Thông tin của tôi"
+  },
+  "zh": {
+      "noticeTitle": "公告",
+      "noNotice": "没有通知。",
+      "noBus": "今天学校通勤巴士停运。",
+      "reservationButton": "票务预订",
+      "infoButton": "我的信息"
+  }
 }
