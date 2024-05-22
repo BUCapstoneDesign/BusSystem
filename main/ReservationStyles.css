@@ -71,12 +71,12 @@ header {
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 30px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
   font-weight: bold;
 }
 
