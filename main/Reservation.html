@@ -7,6 +7,25 @@
     <link rel="stylesheet" href="ReservationStyles.css">
 </head>
 <body>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <a href="Main.html">
+                    <img src="LogoWhite.png" alt="백석대학교 예매 시스템">
+                </a>
+            </div>
+            <div class="language">
+                <select id="language-select" class="styled-select">
+                    <option value="ko">언어 language</option>
+                    <option value="en">English</option>
+                    <option value="vi">Tiếng Việt</option>
+                    <option value="zh">中文</option>
+                </select>
+            </div>
+        </header>
+    </div>
+    
     <div class="reservation-form">
         <h1>날짜와 시간을 선택하세요</h1>
         <div class="form-group">
@@ -36,15 +55,9 @@
         </div>
 
         <div class="form-group">
-            <label for="departure-date">가는날</label>
+            <label for="departure-date">출발 시각</label>
             <input type="date" id="departure-date">
             <input type="time" id="departure-time" value="12:00" readonly>
-        </div>
-
-        <div class="form-group">
-            <label for="return-date">오는날</label>
-            <input type="date" id="return-date" disabled>
-            <input type="time" id="return-time" disabled>
         </div>
 
         <div class="form-group">
