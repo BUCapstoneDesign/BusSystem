@@ -23,11 +23,11 @@
             </div>
         </header>
         <main>
-            <div class="mainbackground">
-                <img src="MainBackground.jpg" alt="메인버스 이미지">
+            <div class="MainBackground">
+                <img src="mainbackground.jpg" alt="메인버스 이미지" class="main-img">
                 <div class="buttons">
                     <button id="reservation-button" onclick="location.href='reservation.html'">승차권 예매</button>
-                    <button id="info-button" onclick="location.href='info.html'">내 정보</button>
+                    <button id="info-button">내 정보</button>
                 </div>
                 <div class="notice">
                     <h3 id="notice-title">공지사항</h3>
@@ -40,6 +40,28 @@
             </div>
         </main>
     </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 data-translate="login_title">로그인</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username" data-translate="username_label">사용자 이름</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" data-translate="password_label">비밀번호</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" data-translate="login_button">로그인</button>
+            </form>
+            <div id="message"></div>
+        </div>
+    </div>
+
     <script src="MainScript.js"></script>
+    <script src="translations.js"></script>
 </body>
 </html>
