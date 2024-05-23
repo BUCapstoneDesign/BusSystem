@@ -185,3 +185,45 @@ button:hover {
   text-decoration: none;
   cursor: pointer;
 }
+
+.seat-selection-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.seat-selection-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #003366;
+  color: white;
+  border-radius: 10px;
+}
+
+.seat-selection-info h3 {
+  margin-top: 0;
+  font-size: 24px;
+}
+
+#selected-seats-count {
+  font-size: 36px;
+  margin: 20px 0;
+}
+
+#reserve-button {
+  background-color: #6c6;
+  border: none;
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+  color: white;
+  transition: background-color 0.5s ease;
+}
+
+#reserve-button:hover {
+  background-color: #5a5;
+}
