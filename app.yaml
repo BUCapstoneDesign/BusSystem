@@ -8,7 +8,13 @@ automatic_scaling:
   min_instances: 1
 
 beta_settings:
-  cloud_sql_instances: bu-capstone-design
+  cloud_sql_instances: "sincere-blade-424410-f5:asia-northeast3:bu-capstone-design"
+
+env_variables:
+  INSTANCE_CONNECTION_NAME: "sincere-blade-424410-f5:asia-northeast3:bu-capstone-design"
+  DB_USER: "myuser"
+  DB_PASSWORD: "qortjrzoqtmxhs12!@"
+  DB_NAME: "bus_reservation_system"
 
 handlers:
   - url: /.*

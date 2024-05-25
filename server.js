@@ -4,20 +4,24 @@ const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
+require('dotenv').config(); // 환경 변수 로드
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 // MySQL 데이터베이스 연결 설정
 const db = mysql.createConnection({
-    host: '34.64.161.197',       // Cloud SQL 인스턴스의 Public IP 주소
-    user: 'myuser',             // Cloud SQL 사용자 이름
-    password: 'qortjrzoqtmxhs12!@',  // Cloud SQL 사용자 비밀번호
-    database: 'bus_reservation_system' // 생성한 데이터베이스 이름
+    host: process.env.DB_HOST,       // MySQL 호스트 주소
+    user: process.env.DB_USER,       // MySQL 사용자 이름
+    password: process.env.DB_PASSWORD, // MySQL 사용자 비밀번호
+    database: process.env.DB_NAME    // 생성한 데이터베이스 이름
 });
 
 db.connect((err) => {
-    if (err) throw err;
+    if (err) {
+        console.error('MySQL 연결 실패:', err);
+        process.exit(1); // 연결 실패 시 애플리케이션 종료
+    }
     console.log('MySQL 연결 성공');
 });
 
@@ -39,15 +43,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 회원 가입 처리
 app.post('/register', (req, res) => {
     const { student_number, password } = req.body;
+    console.log('회원가입 요청 데이터:', req.body); // 디버깅 메시지 추가
     if (student_number && password) {
         bcrypt.hash(password, 10, (err, hash) => {
-            if (err) throw err;
+            if (err) {
+                console.error('비밀번호 해시화 실패:', err); // 디버깅 메시지 추가
+                return res.json({ success: false, message: '서버 오류' });
+            }
             db.query('INSERT INTO users (student_number, password) VALUES (?, ?)', [student_number, hash], (err, result) => {
                 if (err) {
+                    console.error('회원가입 쿼리 실패:', err); // 디버깅 메시지 추가
                     if (err.code === 'ER_DUP_ENTRY') {
                         res.json({ success: false, message: '이미 존재하는 학번입니다.' });
                     } else {
-                        throw err;
+                        res.json({ success: false, message: '서버 오류' });
                     }
                 } else {
                     res.json({ success: true, message: '회원 가입 성공' });
