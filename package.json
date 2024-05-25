@@ -1,0 +1,19 @@
+{
+  "name": "bus_reservation_system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "mysql2": "^3.9.7"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}
