@@ -214,16 +214,33 @@ button:hover {
 }
 
 #reserve-button {
-  background-color: #6c6;
-  border: none;
-  padding: 10px 20px;
-  font-size: 18px;
+  background-color: #ffffff;
+  color: #003366;
   cursor: pointer;
+  padding: 15px 30px;
+  font-size: 20px;
+  border: 2px solid #003366;
   border-radius: 5px;
-  color: white;
-  transition: background-color 0.5s ease;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 #reserve-button:hover {
-  background-color: #5a5;
+  background-color: #003366;
+  color: #ffffff;
+}
+
+.styled-button {
+  background-color: #ffffff;
+  color: #003366;
+  cursor: pointer;
+  padding: 15px 30px;
+  font-size: 20px;
+  border: 2px solid #003366;
+  border-radius: 5px;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.styled-button:hover {
+  background-color: #003366;
+  color: #ffffff;
 }
