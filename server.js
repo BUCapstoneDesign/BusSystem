@@ -4,10 +4,6 @@ const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
-const dotenv = require('dotenv');
-
-// 환경 변수 로드
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8080;
