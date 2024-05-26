@@ -115,6 +115,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'Main.html'));
 });
 
+// 예약 페이지 제공
+app.get('/reservation', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'reservation.html'));
+});
+
 // 사용자 정보 제공
 app.get('/user-info', (req, res) => {
     if (req.session.loggedin) {
