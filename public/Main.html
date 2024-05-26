@@ -199,10 +199,10 @@
             }
         });
 
-        // 로그인 모달 열기
+        // 승차권 예매 버튼 클릭
         document.getElementById('reservation-button').addEventListener('click', function() {
             if (!isLoggedIn()) {
-                showModal('login-modal');
+                showModal('alert-modal');
             } else {
                 window.location.href = '/reservation';
             }
