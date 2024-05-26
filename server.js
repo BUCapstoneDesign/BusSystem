@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
-require('dotenv').config(); // 환경 변수 로드
+require('dotenv').config();  // dotenv 패키지 사용
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -14,7 +14,8 @@ const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,  // 데이터베이스 호스트
     user: process.env.DATABASE_USER,  // 데이터베이스 사용자 이름
     password: process.env.DATABASE_PASSWORD,  // 데이터베이스 비밀번호
-    database: process.env.DATABASE_NAME  // 데이터베이스 이름
+    database: process.env.DATABASE_NAME,  // 데이터베이스 이름
+    port: 3306  // MySQL 기본 포트
 });
 
 db.connect((err) => {
