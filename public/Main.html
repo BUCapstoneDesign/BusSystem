@@ -151,6 +151,8 @@
                         });
                         showModal('info-modal');
                     });
+            } else {
+                showModal('login-modal');
             }
         }
 
@@ -196,11 +198,7 @@
 
         // 내 정보 버튼 클릭
         document.getElementById('info-button').addEventListener('click', function() {
-            if (!isLoggedIn()) {
-                showModal('alert-modal');
-            } else {
-                showUserInfo();
-            }
+            showUserInfo();
         });
 
         // 승차권 예매 버튼 클릭
