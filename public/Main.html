@@ -106,6 +106,114 @@
         </div>
     </div>
 
-    <script src="MainScript.js"></script>
+    <script>
+        // 로그인 상태 확인 및 업데이트
+        function updateUserInfo() {
+            var userInfo = document.getElementById('user-info');
+            if (isLoggedIn()) {
+                var studentNumber = localStorage.getItem('student_number');
+                userInfo.textContent = '학번: ' + studentNumber;
+            } else {
+                userInfo.textContent = '';
+            }
+        }
+
+        // 로그인 여부 확인 함수
+        function isLoggedIn() {
+            return localStorage.getItem('loggedIn') === 'true';
+        }
+
+        // 사용자 정보 표시 함수
+        function showUserInfo() {
+            if (isLoggedIn()) {
+                var studentNumber = localStorage.getItem('student_number');
+                document.getElementById('student-number').textContent = '학번: ' + studentNumber;
+                // 서버에서 사용자 예약 정보 가져오기
+                fetch('/user-info')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                            return;
+                        }
+                        document.getElementById('student-number').textContent = '학번: ' + data.student_number;
+                        document.getElementById('login-time').textContent = '로그인 시간: ' + new Date(data.loginTime).toLocaleString();
+                        const reservationList = document.getElementById('reservation-list');
+                        reservationList.innerHTML = '';
+                        data.reservations.forEach(reservation => {
+                            const li = document.createElement('li');
+                            li.textContent = `좌석 번호: ${reservation.seat_number}, 날짜: ${reservation.reservation_date}, 시간: ${reservation.reservation_time}`;
+                            reservationList.appendChild(li);
+                        });
+                        showModal('info-modal');
+                    });
+            }
+        }
+
+        // 모달 표시 함수
+        function showModal(modalId) {
+            var modal = document.getElementById(modalId);
+            modal.style.display = 'block';
+        }
+
+        // 모달 숨김 함수
+        function hideModal(modalId) {
+            var modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+
+        // 로그인 폼 제출
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var studentNumber = document.getElementById('login-student_number').value;
+            var password = document.getElementById('login-password').value;
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ student_number: studentNumber, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('loggedIn', 'true');
+                    localStorage.setItem('student_number', data.student_number);
+                    hideModal('login-modal');
+                    updateUserInfo();
+                } else {
+                    document.getElementById('login-message').textContent = data.message;
+                }
+            });
+        });
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', updateUserInfo);
+
+        // 내 정보 버튼 클릭
+        document.getElementById('info-button').addEventListener('click', function() {
+            if (!isLoggedIn()) {
+                showModal('alert-modal');
+            } else {
+                showUserInfo();
+            }
+        });
+
+        // 로그인 모달 열기
+        document.getElementById('reservation-button').addEventListener('click', function() {
+            if (!isLoggedIn()) {
+                showModal('login-modal');
+            } else {
+                window.location.href = '/reservation';
+            }
+        });
+
+        // 모달 닫기 버튼
+        document.querySelectorAll('.close').forEach(button => {
+            button.addEventListener('click', function() {
+                hideModal(this.parentElement.parentElement.id);
+            });
+        });
+    </script>
 </body>
 </html>

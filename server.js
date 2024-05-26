@@ -28,10 +28,13 @@ db.connect((err) => {
 
 // Express 세션 설정
 app.use(session({
-    secret: 'secret', // 고유의 문자열로 변경하세요
+    secret: process.env.SESSION_SECRET || 'secret', // 고유의 문자열로 변경하세요
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production', // 프로덕션 환경에서는 true로 설정
+        httpOnly: true
+    }
 }));
 
 // 바디 파서 설정
@@ -74,9 +77,16 @@ app.post('/login', (req, res) => {
     const { student_number, password } = req.body;
     if (student_number && password) {
         db.query('SELECT * FROM users WHERE student_number = ?', [student_number], (err, results) => {
-            if (err) throw err;
+            if (err) {
+                console.error('사용자 조회 쿼리 실패:', err);
+                return res.json({ success: false, message: '서버 오류' });
+            }
             if (results.length > 0) {
                 bcrypt.compare(password, results[0].password, (err, result) => {
+                    if (err) {
+                        console.error('비밀번호 비교 실패:', err);
+                        return res.json({ success: false, message: '서버 오류' });
+                    }
                     if (result) {
                         req.session.loggedin = true;
                         req.session.student_number = student_number;
