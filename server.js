@@ -1,10 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
-require('dotenv').config(); // dotenv 패키지를 사용하여 .env 파일 로드
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -14,7 +14,8 @@ const db = mysql.createConnection({
     host: process.env.DB_HOST,  // 데이터베이스 호스트
     user: process.env.DB_USER,  // 데이터베이스 사용자 이름
     password: process.env.DB_PASSWORD,  // 데이터베이스 비밀번호
-    database: process.env.DB_NAME  // 데이터베이스 이름
+    database: process.env.DB_NAME,  // 데이터베이스 이름
+    port: process.env.DB_PORT // 데이터베이스 포트
 });
 
 db.connect((err) => {
