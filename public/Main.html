@@ -109,13 +109,20 @@
     <script>
         // 로그인 상태 확인 및 업데이트
         function updateUserInfo() {
-            var userInfo = document.getElementById('user-info');
-            if (isLoggedIn()) {
-                var studentNumber = localStorage.getItem('student_number');
-                userInfo.textContent = '학번: ' + studentNumber;
-            } else {
-                userInfo.textContent = '';
-            }
+            fetch('/check-login-status')
+                .then(response => response.json())
+                .then(data => {
+                    var userInfo = document.getElementById('user-info');
+                    if (data.loggedIn) {
+                        localStorage.setItem('loggedIn', 'true');
+                        localStorage.setItem('student_number', data.student_number);
+                        userInfo.textContent = '학번: ' + data.student_number;
+                    } else {
+                        localStorage.removeItem('loggedIn');
+                        localStorage.removeItem('student_number');
+                        userInfo.textContent = '';
+                    }
+                });
         }
 
         // 로그인 여부 확인 함수
@@ -126,9 +133,6 @@
         // 사용자 정보 표시 함수
         function showUserInfo() {
             if (isLoggedIn()) {
-                var studentNumber = localStorage.getItem('student_number');
-                document.getElementById('student-number').textContent = '학번: ' + studentNumber;
-                // 서버에서 사용자 예약 정보 가져오기
                 fetch('/user-info')
                     .then(response => response.json())
                     .then(data => {
