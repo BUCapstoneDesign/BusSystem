@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>백석대학교 통학버스 시스템</title>
+    <link rel="stylesheet" href="MainStyles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <a href="Main.html">
+                    <img src="LogoWhite.png" alt="백석대학교 예매 시스템">
+                </a>
+            </div>
+            <div id="user-info" class="user-info"></div>
+            <div class="language">
+                <select id="language-select" class="styled-select">
+                    <option value="ko">언어 language</option>
+                    <option value="en">English</option>
+                    <option value="vi">Tiếng Việt</option>
+                    <option value="zh">中文</option>
+                </select>
+            </div>
+        </header>
+        <main>
+            <div class="MainBackground">
+                <img src="MainBackground.jpg" alt="메인버스 이미지" class="main-img">
+                <div class="buttons">
+                    <button id="reservation-button">승차권 예매</button>
+                    <button id="info-button">내 정보</button>
+                </div>
+                <div class="notice">
+                    <h3 id="notice-title">공지사항</h3>
+                    <div class="notice-content">
+                        <p id="no-notice">공지사항이 없습니다.</p>
+                        <p class="date"></p>
+                        <p id="no-bus">오늘 학교 통학버스 운행 안합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 로그인 모달 -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>로그인</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-student_number">학번</label>
+                    <input type="text" id="login-student_number" name="student_number" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">비밀번호</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <button type="submit">로그인</button>
+                <button type="button" id="register-button">회원 가입</button>
+                <div id="login-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 회원 가입 모달 -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>회원 가입</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-student_number">학번</label>
+                    <input type="text" id="register-student_number" name="student_number" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">비밀번호</label>
+                    <input type="password" id="register-password" name="password" required>
+                </div>
+                <button type="submit">회원 가입</button>
+                <div id="register-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 로그인 필요 알림 모달 -->
+    <div id="alert-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>알림</h2>
+            <p>로그인 후 사용 가능합니다.</p>
+        </div>
+    </div>
+
+    <!-- 내 정보 모달 -->
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>내 정보</h2>
+            <p id="student-number"></p>
+            <p id="login-time"></p>
+            <div id="reservations">
+                <h3>예약된 좌석</h3>
+                <ul id="reservation-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 로그인 상태 확인 및 업데이트
+        function updateUserInfo() {
+            fetch('/check-login-status')
+                .then(response => response.json())
+                .then(data => {
+                    var userInfo = document.getElementById('user-info');
+                    if (data.loggedIn) {
+                        localStorage.setItem('loggedIn', 'true');
+                        localStorage.setItem('student_number', data.student_number);
+                        userInfo.textContent = '학번: ' + data.student_number;
+                    } else {
+                        localStorage.removeItem('loggedIn');
+                        localStorage.removeItem('student_number');
+                        userInfo.textContent = '';
+                    }
+                });
+        }
+
+        // 로그인 여부 확인 함수
+        function isLoggedIn() {
+            return localStorage.getItem('loggedIn') === 'true';
+        }
+
+        // 사용자 정보 표시 함수
+        function showUserInfo() {
+            if (isLoggedIn()) {
+                fetch('/user-info')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                            return;
+                        }
+                        document.getElementById('student-number').textContent = '학번: ' + data.student_number;
+                        document.getElementById('login-time').textContent = '로그인 시간: ' + new Date(data.loginTime).toLocaleString();
+                        const reservationList = document.getElementById('reservation-list');
+                        reservationList.innerHTML = '';
+                        data.reservations.forEach(reservation => {
+                            const li = document.createElement('li');
+                            li.textContent = `좌석 번호: ${reservation.seat_number}, 날짜: ${reservation.reservation_date}, 시간: ${reservation.reservation_time}`;
+                            reservationList.appendChild(li);
+                        });
+                        showModal('info-modal');
+                    });
+            } else {
+                showModal('login-modal');
+            }
+        }
+
+        // 모달 표시 함수
+        function showModal(modalId) {
+            var modal = document.getElementById(modalId);
+            modal.style.display = 'block';
+        }
+
+        // 모달 숨김 함수
+        function hideModal(modalId) {
+            var modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+
+        // 로그인 폼 제출
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var studentNumber = document.getElementById('login-student_number').value;
+            var password = document.getElementById('login-password').value;
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ student_number: studentNumber, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('loggedIn', 'true');
+                    localStorage.setItem('student_number', data.student_number);
+                    hideModal('login-modal');
+                    updateUserInfo();
+                } else {
+                    document.getElementById('login-message').textContent = data.message;
+                }
+            });
+        });
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', updateUserInfo);
+
+        // 내 정보 버튼 클릭
+        document.getElementById('info-button').addEventListener('click', function() {
+            showUserInfo();
+        });
+
+        // 승차권 예매 버튼 클릭
+        document.getElementById('reservation-button').addEventListener('click', function() {
+            if (!isLoggedIn()) {
+                showModal('alert-modal');
+            } else {
+                window.location.href = '/reservation';
+            }
+        });
+
+        // 모달 닫기 버튼
+        document.querySelectorAll('.close').forEach(button => {
+            button.addEventListener('click', function() {
+                hideModal(this.parentElement.parentElement.id);
+            });
+        });
+    </script>
+</body>
+</html>
