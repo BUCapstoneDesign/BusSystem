@@ -260,6 +260,10 @@ button:hover {
   display: flex;
   flex-direction: column;
 }
+#login-form, #register-button {
+  margin-top: 10px;
+}
+
 
 #login-form .form-group,
 #register-form .form-group {
