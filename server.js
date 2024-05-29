@@ -4,6 +4,7 @@ const mysql = require('mysql2');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
 const path = require('path');
 
 const app = express();
@@ -26,9 +27,14 @@ db.connect((err) => {
     console.log('MySQL 연결 성공');
 });
 
+// 세션 저장소 설정
+const sessionStore = new MySQLStore({}, db);
+
 // Express 세션 설정
 app.use(session({
+    key: 'session_cookie_name',
     secret: process.env.SESSION_SECRET || 'secret', // 고유의 문자열로 변경하세요
+    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: { 
@@ -43,6 +49,15 @@ app.use(bodyParser.json());
 
 // 정적 파일 제공
 app.use(express.static(path.join(__dirname, 'public')));
+
+// 로그인 상태 확인 미들웨어
+const checkLogin = (req, res, next) => {
+    if (req.session.loggedin) {
+        next();
+    } else {
+        res.json({ error: '로그인 필요' });
+    }
+};
 
 // 회원 가입 처리
 app.post('/register', (req, res) => {
@@ -127,44 +142,32 @@ app.get('/', (req, res) => {
 });
 
 // 예약 페이지 제공
-app.get('/reservation', (req, res) => {
-    if (req.session.loggedin) {
-        res.sendFile(path.join(__dirname, 'public', 'reservation.html'));
-    } else {
-        res.redirect('/');
-    }
+app.get('/reservation', checkLogin, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'reservation.html'));
 });
 
 // 사용자 정보 제공
-app.get('/user-info', (req, res) => {
-    if (req.session.loggedin) {
-        const query = 'SELECT seat_number, reservation_date, reservation_time FROM reservations WHERE student_number = ?';
-        db.query(query, [req.session.student_number], (err, results) => {
-            if (err) throw err;
-            res.json({
-                student_number: req.session.student_number,
-                loginTime: req.session.loginTime,
-                reservations: results
-            });
+app.get('/user-info', checkLogin, (req, res) => {
+    const query = 'SELECT seat_number, reservation_date, reservation_time FROM reservations WHERE student_number = ?';
+    db.query(query, [req.session.student_number], (err, results) => {
+        if (err) throw err;
+        res.json({
+            student_number: req.session.student_number,
+            loginTime: req.session.loginTime,
+            reservations: results
         });
-    } else {
-        res.json({ error: '로그인 필요' });
-    }
+    });
 });
 
 // 좌석 예약 처리
-app.post('/reserve-seat', (req, res) => {
-    if (req.session.loggedin) {
-        const { seat_number, reservation_date, reservation_time } = req.body;
-        const student_number = req.session.student_number;
-        db.query('INSERT INTO reservations (student_number, seat_number, reservation_date, reservation_time) VALUES (?, ?, ?, ?)', 
-            [student_number, seat_number, reservation_date, reservation_time], (err, result) => {
-            if (err) throw err;
-            res.json({ success: true, message: '좌석 예약 성공' });
-        });
-    } else {
-        res.json({ success: false, message: '로그인 필요' });
-    }
+app.post('/reserve-seat', checkLogin, (req, res) => {
+    const { seat_number, reservation_date, reservation_time } = req.body;
+    const student_number = req.session.student_number;
+    db.query('INSERT INTO reservations (student_number, seat_number, reservation_date, reservation_time) VALUES (?, ?, ?, ?)', 
+        [student_number, seat_number, reservation_date, reservation_time], (err, result) => {
+        if (err) throw err;
+        res.json({ success: true, message: '좌석 예약 성공' });
+    });
 });
 
 // 예약된 좌석 조회
