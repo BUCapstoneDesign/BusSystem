@@ -75,6 +75,7 @@ app.post('/register', (req, res) => {
 // 로그인 처리
 app.post('/login', (req, res) => {
     const { student_number, password } = req.body;
+    console.log('로그인 요청 데이터:', req.body); // 디버깅 메시지 추가
     if (student_number && password) {
         db.query('SELECT * FROM users WHERE student_number = ?', [student_number], (err, results) => {
             if (err) {

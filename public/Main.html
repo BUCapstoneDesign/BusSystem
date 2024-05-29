@@ -151,8 +151,6 @@
                         });
                         showModal('info-modal');
                     });
-            } else {
-                showModal('login-modal');
             }
         }
 
@@ -173,6 +171,7 @@
             event.preventDefault();
             var studentNumber = document.getElementById('login-student_number').value;
             var password = document.getElementById('login-password').value;
+
             fetch('/login', {
                 method: 'POST',
                 headers: {
@@ -185,11 +184,17 @@
                 if (data.success) {
                     localStorage.setItem('loggedIn', 'true');
                     localStorage.setItem('student_number', data.student_number);
+                    document.getElementById('login-student_number').value = ''; // 입력 필드 비우기
+                    document.getElementById('login-password').value = ''; // 입력 필드 비우기
                     hideModal('login-modal');
                     updateUserInfo();
                 } else {
                     document.getElementById('login-message').textContent = data.message;
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('login-message').textContent = '서버 오류. 다시 시도해주세요.';
             });
         });
 
@@ -198,7 +203,11 @@
 
         // 내 정보 버튼 클릭
         document.getElementById('info-button').addEventListener('click', function() {
-            showUserInfo();
+            if (!isLoggedIn()) {
+                showModal('alert-modal');
+            } else {
+                showUserInfo();
+            }
         });
 
         // 승차권 예매 버튼 클릭
