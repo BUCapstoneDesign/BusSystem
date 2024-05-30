@@ -143,7 +143,7 @@ app.get('/', (req, res) => {
 // 예약 페이지 제공
 app.get('/reservation', (req, res) => {
     if (req.session.loggedin) {
-        res.sendFile(path.join(__dirname, 'public', 'reservation.html'));
+        res.sendFile(path.join(__dirname, 'public', 'Reservation.html'));
     } else {
         res.redirect('/');
     }
