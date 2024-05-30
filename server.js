@@ -1,14 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const mysql = require('mysql');
+const mysql = require('mysql2'); // 변경된 부분
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 // MySQL 데이터베이스 연결 설정
 const db = mysql.createConnection({
@@ -85,7 +85,6 @@ app.post('/register', (req, res) => {
 // 로그인 처리
 app.post('/login', (req, res) => {
     const { student_number, password } = req.body;
-    console.log('로그인 요청 데이터:', req.body); // 디버깅 메시지 추가
     if (student_number && password) {
         db.query('SELECT * FROM users WHERE student_number = ?', [student_number], (err, results) => {
             if (err) {
@@ -114,12 +113,6 @@ app.post('/login', (req, res) => {
     } else {
         res.json({ success: false, message: '모든 필드를 입력하세요' });
     }
-});
-
-// 로그아웃 처리
-app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/');
 });
 
 // 로그인 상태 확인 및 학번 반환
