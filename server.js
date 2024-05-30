@@ -126,7 +126,7 @@ app.get('/check-login-status', (req, res) => {
 
 // 기본 라우트 (Main.html 제공)
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'main.html'));
+    res.sendFile(path.join(__dirname, 'public', 'Main.html'));
 });
 
 // 예약 페이지 제공
