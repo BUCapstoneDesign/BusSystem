@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const mysql = require('mysql2'); // 변경된 부분
+const mysql = require('mysql2'); // mysql2 사용
+const MySQLStore = require('express-mysql-session')(session);
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
@@ -28,17 +29,27 @@ db.connect((err) => {
     }
 });
 
+// MySQL 세션 저장소 설정
+const sessionStore = new MySQLStore({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 세션 설정
 app.use(session({
-    secret: 'secretKey',
+    secret: 'yourSecretKey',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    store: sessionStore, // MySQL 세션 저장소 사용
     cookie: { 
-        secure: false, // HTTPS 사용 시 true로 설정
+        secure: false, // HTTPS를 사용한다면 true로 설정
         maxAge: 30 * 60 * 1000 // 30분 후 세션 만료
     }
 }));
@@ -126,7 +137,7 @@ app.get('/check-login-status', (req, res) => {
 
 // 기본 라우트 (Main.html 제공)
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'Main.html'));
+    res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
 // 예약 페이지 제공
