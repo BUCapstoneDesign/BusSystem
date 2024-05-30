@@ -1,48 +1,58 @@
-require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql2');
-const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const mysql = require('mysql');
+const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcrypt');
+require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = 8080;
 
 // MySQL 데이터베이스 연결 설정
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,  // 데이터베이스 호스트
-    user: process.env.DB_USER,  // 데이터베이스 사용자 이름
-    password: process.env.DB_PASSWORD,  // 데이터베이스 비밀번호
-    database: process.env.DB_NAME,  // 데이터베이스 이름
-    port: process.env.DB_PORT // 데이터베이스 포트
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT
 });
 
 db.connect((err) => {
     if (err) {
-        console.error('MySQL 연결 실패:', err);
-        process.exit(1); // 연결 실패 시 애플리케이션 종료
+        console.error('Error connecting to the database:', err);
+        process.exit(1); // 연결 실패 시 프로세스를 종료합니다.
+    } else {
+        console.log('Connected to MySQL database.');
     }
-    console.log('MySQL 연결 성공');
 });
 
-// Express 세션 설정
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 세션 설정
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'secret', // 고유의 문자열로 변경하세요
+    secret: 'secretKey',
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: { 
-        secure: process.env.NODE_ENV === 'production', // 프로덕션 환경에서는 true로 설정
-        httpOnly: true
+        secure: false, // HTTPS 사용 시 true로 설정
+        maxAge: 30 * 60 * 1000 // 30분 후 세션 만료
     }
 }));
 
-// 바디 파서 설정
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// Load translations
+let translations = {};
+fs.readFile(path.join(__dirname, 'public', 'translations.json'), (err, data) => {
+    if (err) throw err;
+    translations = JSON.parse(data);
+});
 
-// 정적 파일 제공
-app.use(express.static(path.join(__dirname, 'public')));
+function translate(lang, text) {
+    return translations[lang][text] || text;
+}
 
 // 회원 가입 처리
 app.post('/register', (req, res) => {
@@ -123,7 +133,7 @@ app.get('/check-login-status', (req, res) => {
 
 // 기본 라우트 (Main.html 제공)
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'Main.html'));
+    res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
 // 예약 페이지 제공
