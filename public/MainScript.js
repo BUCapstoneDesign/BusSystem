@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const languageSelect = document.getElementById('language-select');
     const infoButton = document.getElementById('info-button');
     const reservationButton = document.getElementById('reservation-button');
     const loginModal = document.getElementById('login-modal');
@@ -17,32 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginTimeP = document.getElementById('login-time');
     const reservationList = document.getElementById('reservation-list');
     let reservedSeats = [];
-    let translations = {};
-
-    // Fetch translations
-    fetch('translations.json')
-        .then(response => response.json())
-        .then(data => {
-            translations = data;
-            applyTranslations('ko'); // 기본 언어를 한국어로 설정합니다.
-        })
-        .catch(error => console.error('Error fetching translations:', error));
-
-    // Apply translations based on selected language
-    function applyTranslations(lang) {
-        document.querySelectorAll('[data-translate]').forEach(element => {
-            const key = element.getAttribute('data-translate');
-            if (translations[lang] && translations[lang][key]) {
-                element.textContent = translations[lang][key];
-            }
-        });
-    }
-
-    // Handle language change
-    languageSelect.addEventListener('change', () => {
-        const selectedLang = languageSelect.value;
-        applyTranslations(selectedLang);
-    });
 
     // Handle "내 정보" button click
     infoButton.addEventListener('click', () => {
@@ -208,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update selected seats count
     function updateSelectedSeatsCount() {
         const selectedSeats = document.querySelectorAll('.seat.selected');
-        selectedSeatsCount.textContent = `${translations[languageSelect.value]['selected_seats'] || '선택된 좌석'}: ${selectedSeats.length}`;
+        selectedSeatsCount.textContent = `선택된 좌석: ${selectedSeats.length}`;
     }
 
     // Handle reserve button click
@@ -301,33 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(error => console.error('Error cancelling reservation:', error));
-    }
-
-    // Translate page content based on selected language
-    function translatePage(lang) {
-        fetch(`/translations.json`)
-            .then(response => response.json())
-            .then(translations => {
-                applyTranslations(translations[lang]);
-            })
-            .catch(error => console.error('Error fetching translations:', error));
-    }
-
-    function applyTranslations(translations) {
-        document.getElementById('reservation-button').textContent = translations['reservation_button'];
-        document.getElementById('info-button').textContent = translations['info_button'];
-        document.getElementById('notice-title').textContent = translations['notice_title'];
-        document.getElementById('no-notice').textContent = translations['no_notice'];
-        document.getElementById('no-bus').textContent = translations['no_bus'];
-        document.getElementById('login-title').textContent = translations['login'];
-        document.getElementById('login-button').textContent = translations['login'];
-        document.getElementById('register-button').textContent = translations['register'];
-        document.getElementById('register-title').textContent = translations['register'];
-        document.getElementById('register-button-form').textContent = translations['register'];
-        document.getElementById('alert-title').textContent = translations['alert_message'];
-        document.getElementById('go-login-button').textContent = translations['go_login_button'];
-        document.getElementById('info-title').textContent = translations['info_title'];
-        document.getElementById('reservations-title').textContent = translations['reservations_title'];
     }
 
     // Fetch reserved seats on page load
