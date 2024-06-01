@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 if (data.loggedIn) {
-                    location.href = 'reservation.html';
+                    location.href = 'Reservation.html';
                 } else {
                     alertModal.style.display = 'block';
                 }
