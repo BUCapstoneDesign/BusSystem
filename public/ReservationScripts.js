@@ -11,7 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedSeat = null;
     let reservedSeats = [];
 
-    // Disable weekends in the date picker
+    // 요일을 반환하는 함수
+    function getDayOfWeek(date) {
+        const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+        return days[date.getDay()];
+    }
+
+    // 주말을 제외한 날짜 선택 처리
     departureDateInput.addEventListener('input', () => {
         const selectedDate = new Date(departureDateInput.value);
         if (selectedDate.getDay() === 0 || selectedDate.getDay() === 6) {
@@ -22,9 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Fetch available bus times for the selected date
+    // 선택한 날짜의 요일에 맞는 버스 시간을 가져오는 함수
     function fetchBusTimes(departure, date) {
-        fetch(`/bus-schedule?departure=${departure}&date=${date.toISOString().split('T')[0]}`)
+        const dayOfWeek = getDayOfWeek(date);
+        fetch(`/bus-schedule?departure=${departure}&day=${dayOfWeek}`)
             .then(response => response.json())
             .then(data => {
                 updateBusTimes(data.times);
@@ -32,9 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error fetching bus times:', error));
     }
 
-    // Update the departure time options based on the fetched bus times
+    // 버스 시간을 업데이트하는 함수
     function updateBusTimes(times) {
-        departureTimeInput.innerHTML = ''; // Clear existing options
+        departureTimeInput.innerHTML = ''; // 기존 옵션을 초기화합니다.
         times.forEach(time => {
             const option = document.createElement('option');
             option.value = time;
@@ -43,25 +50,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle "승차권 예약" button click
+    // "승차권 예약" 버튼 클릭 핸들러
     submitButton.addEventListener('click', () => {
         seatSelectionModal.style.display = 'block';
         fetchReservedSeats();
     });
 
-    // Close the modal
+    // 모달 닫기 핸들러
     closeModal.addEventListener('click', () => {
         seatSelectionModal.style.display = 'none';
     });
 
-    // Close the modal when clicking outside of it
+    // 모달 외부 클릭 시 닫기
     window.addEventListener('click', (event) => {
         if (event.target == seatSelectionModal) {
             seatSelectionModal.style.display = 'none';
         }
     });
 
-    // Seat selection logic
+    // 좌석 선택 로직
     seats.forEach(seat => {
         seat.addEventListener('click', () => {
             if (!seat.classList.contains('reserved')) {
@@ -75,13 +82,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Update selected seats count
+    // 선택된 좌석 수 업데이트
     function updateSelectedSeatsCount() {
         const selectedSeats = document.querySelectorAll('.seat.selected');
         selectedSeatsCount.textContent = `선택된 좌석: ${selectedSeats.length}`;
     }
 
-    // Handle reserve button click
+    // "예약" 버튼 클릭 핸들러
     reserveButton.addEventListener('click', () => {
         if (!selectedSeat) {
             alert('좌석을 선택하세요.');
@@ -120,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => console.error('Error during reservation:', error));
     });
 
-    // Fetch reserved seats
+    // 예약된 좌석을 가져오는 함수
     function fetchReservedSeats() {
         const reservationDate = departureDateInput.value;
         const reservationTime = departureTimeInput.value;
@@ -133,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error fetching reserved seats:', error));
     }
 
-    // Update seats UI
+    // 좌석 UI 업데이트
     function updateSeats() {
         seats.forEach(seat => {
             const seatNumber = parseInt(seat.getAttribute('data-seat'));
