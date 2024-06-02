@@ -11,7 +11,6 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 8080;
 
-// MySQL 데이터베이스 연결 설정
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -52,14 +51,10 @@ app.use(session({
     }
 }));
 
-let translations = {};
-fs.readFile(path.join(__dirname, 'public', 'translations.json'), (err, data) => {
-    if (err) throw err;
-    translations = JSON.parse(data);
-});
-
-function translate(lang, text) {
-    return translations[lang][text] || text;
+// 요일 이름 변환 함수
+function getKoreanDayName(date) {
+    const days = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+    return days[date.getDay()];
 }
 
 // 회원 가입 처리
@@ -168,10 +163,13 @@ app.post('/reserve-seat', (req, res) => {
         const busQuery = `
             SELECT Busid 
             FROM Bus 
-            WHERE Buslocation = ? AND Busday = DAYNAME(?) AND Bustime = ?
+            WHERE Buslocation = ? AND Busday = ? AND Bustime = ?
         `;
 
-        db.query(busQuery, [departure, date, time], (err, results) => {
+        const dateObj = new Date(date);
+        const dayName = getKoreanDayName(dateObj);  // 요일 이름 변환
+
+        db.query(busQuery, [departure, dayName, time], (err, results) => {
             if (err) {
                 console.error('버스 조회 실패:', err);
                 return res.json({ success: false, message: '버스 조회 실패' });
@@ -214,8 +212,9 @@ app.get('/reserved-seats', (req, res) => {
 // 버스 스케줄 조회
 app.get('/bus-schedule', (req, res) => {
     const { departure, date } = req.query;
-    const query = 'SELECT Bustime FROM Bus WHERE Buslocation = ? AND Busday = DAYNAME(?)';
-    db.query(query, [departure, date], (err, results) => {
+    const dayName = getKoreanDayName(new Date(date));  // 요일 이름 변환
+    const query = 'SELECT Bustime FROM Bus WHERE Buslocation = ? AND Busday = ?';
+    db.query(query, [departure, dayName], (err, results) => {
         if (err) {
             console.error('버스 스케줄 조회 실패:', err);
             return res.status(500).json({ success: false, message: '서버 오류' });
@@ -227,15 +226,15 @@ app.get('/bus-schedule', (req, res) => {
 
 // 예약 취소 처리
 app.post('/cancel-reservation', (req, res) => {
+    const { reservation_id } = req.body;
     if (req.session.loggedin) {
-        const { reservation_id } = req.body;
-
-        db.query('DELETE FROM reservations WHERE reservation_id = ? AND student_id = ?', [reservation_id, req.session.student_id], (err, result) => {
+        const query = 'DELETE FROM reservations WHERE reservation_id = ? AND student_id = ?';
+        db.query(query, [reservation_id, req.session.student_id], (err, result) => {
             if (err) {
                 console.error('예약 취소 실패:', err);
                 return res.json({ success: false, message: '예약 취소 실패' });
             }
-            res.json({ success: true, message: '예약 취소 성공' });
+            res.json({ success: true, message: '예약이 취소되었습니다.' });
         });
     } else {
         res.json({ success: false, message: '로그인 필요' });
