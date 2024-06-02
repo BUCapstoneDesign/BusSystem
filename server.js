@@ -219,11 +219,10 @@ app.post('/cancel-reservation', (req, res) => {
     }
 });
 
-// 버스 스케줄 조회
 app.get('/bus-schedule', (req, res) => {
-    const { departure, date } = req.query;
+    const { departure, day } = req.query;
     const query = 'SELECT Bustime FROM Bus WHERE Buslocation = ? AND Busday = ?';
-    db.query(query, [departure, date], (err, results) => {
+    db.query(query, [departure, day], (err, results) => {
         if (err) {
             console.error('버스 스케줄 조회 실패:', err);
             return res.status(500).json({ success: false, message: '서버 오류' });

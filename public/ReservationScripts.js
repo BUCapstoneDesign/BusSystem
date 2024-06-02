@@ -46,12 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // 버스 시간을 업데이트하는 함수
     function updateBusTimes(times) {
         departureTimeInput.innerHTML = ''; // 기존 옵션을 초기화합니다.
-        times.forEach(time => {
+        if (times.length === 0) {
             const option = document.createElement('option');
-            option.value = time;
-            option.textContent = time;
+            option.value = '';
+            option.textContent = '해당 날짜에 이용 가능한 버스가 없습니다';
             departureTimeInput.appendChild(option);
-        });
+        } else {
+            times.forEach(time => {
+                const option = document.createElement('option');
+                option.value = time;
+                option.textContent = time;
+                departureTimeInput.appendChild(option);
+            });
+        }
     }
 
     // "승차권 예약" 버튼 클릭 핸들러
