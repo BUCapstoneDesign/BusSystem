@@ -34,7 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch(`/bus-schedule?departure=${departure}&day=${dayOfWeek}`)
             .then(response => response.json())
             .then(data => {
-                updateBusTimes(data.times);
+                if (data.success) {
+                    updateBusTimes(data.times);
+                } else {
+                    console.error('Error fetching bus times:', data.message);
+                }
             })
             .catch(error => console.error('Error fetching bus times:', error));
     }
@@ -117,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(result => {
             if (result.success) {
-                alert(`좌석이 예약되었습니다.`);
+                alert('좌석이 예약되었습니다.');
                 seatSelectionModal.style.display = 'none';
                 fetchReservedSeats();
             } else {
