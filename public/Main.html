@@ -33,8 +33,18 @@
                 <div class="notice">
                     <h3 id="notice-title" data-translate="notice_title">공지사항</h3>
                     <div class="notice-content">
-                        <p id="no-notice" data-translate="no_notice">공지사항이 없습니다.</p>
-                        <p id="no-bus" data-translate="no_bus">오늘 학교 통학버스 운행 안합니다.</p>
+                        <table id="bus-schedule">
+                            <thead>
+                                <tr>
+                                    <th>탑승 장소</th>
+                                    <th>탑승 시간</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bus-schedule-body">
+                                <!-- 서버에서 데이터 가져와서 여기에 추가 -->
+                            </tbody>
+                        </table>
+                        <button onclick="openBusTimetable()">전체 시간표 보기</button>
                     </div>
                 </div>
             </div>
@@ -106,6 +116,32 @@
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/api/bus-schedule')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('bus-schedule-body');
+                    tableBody.innerHTML = ''; // 기존 내용 제거
+                    data.forEach(bus => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td>${bus.Buslocation}</td><td>${bus.Bustime}</td>`;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching bus schedule:', error);
+                });
+        });
+
+        // 팝업 열기 함수
+        function openBusTimetable() {
+            var popup = window.open('', 'Bus Timetable', 'width=800,height=600');
+            popup.document.write('<html><head><title>Bus Timetable</title></head><body>');
+            popup.document.write('<img src="BusTimeTable.jpg" alt="Bus Timetable">');
+            popup.document.write('</body></html>');
+        }
+    </script>
     <script src="MainScript.js"></script>
 </body>
 </html>

@@ -209,18 +209,17 @@ app.get('/reserved-seats', (req, res) => {
     });
 });
 
-// 버스 스케줄 조회
-app.get('/bus-schedule', (req, res) => {
-    const { departure, date } = req.query;
-    const dayName = getKoreanDayName(new Date(date));  // 요일 이름 변환
-    const query = 'SELECT Bustime FROM Bus WHERE Buslocation = ? AND Busday = ?';
-    db.query(query, [departure, dayName], (err, results) => {
+// 오늘의 버스 스케줄 조회
+app.get('/api/bus-schedule', (req, res) => {
+    const today = new Date();
+    const dayName = getKoreanDayName(today);
+    const query = 'SELECT Buslocation, Bustime FROM Bus WHERE Busday = ?';
+    db.query(query, [dayName], (err, results) => {
         if (err) {
             console.error('버스 스케줄 조회 실패:', err);
             return res.status(500).json({ success: false, message: '서버 오류' });
         }
-        const times = results.map(row => row.Bustime);
-        res.json({ success: true, times });
+        res.json(results);
     });
 });
 
