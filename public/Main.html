@@ -44,6 +44,7 @@
                                 <!-- 서버에서 데이터 가져와서 여기에 추가 -->
                             </tbody>
                         </table>
+                        <p id="no-bus" style="display:none;">운행중인 버스가 없습니다.</p>
                         <button onclick="openBusTimetable()">전체 시간표 보기</button>
                     </div>
                 </div>
@@ -116,18 +117,32 @@
         </div>
     </div>
 
+    <!-- BusTimeTable 팝업 -->
+    <div id="timetable-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img src="BusTimeTable.png" alt="전체 시간표">
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             fetch('/api/bus-schedule')
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.getElementById('bus-schedule-body');
-                    tableBody.innerHTML = ''; // 기존 내용 제거
-                    data.forEach(bus => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `<td>${bus.Buslocation}</td><td>${bus.Bustime}</td>`;
-                        tableBody.appendChild(row);
-                    });
+                    const noBusMessage = document.getElementById('no-bus');
+                    if (data.success) {
+                        data.data.forEach(bus => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `<td>${bus.Buslocation}</td><td>${bus.Bustime}</td>`;
+                            tableBody.appendChild(row);
+                        });
+                        noBusMessage.style.display = 'none';
+                    } else {
+                        noBusMessage.textContent = data.message;
+                        noBusMessage.style.display = 'block';
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching bus schedule:', error);
@@ -136,10 +151,19 @@
 
         // 팝업 열기 함수
         function openBusTimetable() {
-            var popup = window.open('', 'Bus Timetable', 'width=800,height=600');
-            popup.document.write('<html><head><title>Bus Timetable</title></head><body>');
-            popup.document.write('<img src="BusTimeTable.png" alt="Bus Timetable">');
-            popup.document.write('</body></html>');
+            const modal = document.getElementById('timetable-modal');
+            modal.style.display = 'block';
+
+            const closeBtn = document.getElementsByClassName('close')[0];
+            closeBtn.onclick = function() {
+                modal.style.display = 'none';
+            };
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            };
         }
     </script>
     <script src="MainScript.js"></script>

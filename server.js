@@ -213,13 +213,19 @@ app.get('/reserved-seats', (req, res) => {
 app.get('/api/bus-schedule', (req, res) => {
     const today = new Date();
     const dayName = getKoreanDayName(today);
+
+    // 주말인 경우
+    if (dayName === '토요일' || dayName === '일요일') {
+        return res.json({ success: false, message: '운행중인 버스가 없습니다.' });
+    }
+
     const query = 'SELECT Buslocation, Bustime FROM Bus WHERE Busday = ?';
     db.query(query, [dayName], (err, results) => {
         if (err) {
             console.error('버스 스케줄 조회 실패:', err);
             return res.status(500).json({ success: false, message: '서버 오류' });
         }
-        res.json(results);
+        res.json({ success: true, data: results });
     });
 });
 
