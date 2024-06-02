@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--meta name="viewport" content="width=device-width, initial-scale=1.0"-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>통학버스시간표</title>
+    <style>
+        body, html{
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            float: center;
+            height: 100vh;
+            margin: 0;
+            top: 50;
+            left: 50;
+        }
+
+        .container{
+            margin-top: 5%;
+            margin-left: 5%;
+            margin-right: 10%;
+            float: center;
+        }
+
+        #grid{
+            display: gird;
+            grid-template-columns: repeat(2, 2fr);
+            grid-gap: 10%;
+        }
+
+        .center-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
+            padding-left: 30%;
+            width: auto;
+        }
+
+        /*robot container*/
+    #robot-container {
+            position: relative;
+            width: auto;
+            height: 75px;
+            align-items: center;
+            text-align: center;
+            justify-content:center;
+            
+        }
+
+        #robot-image {
+            width: 100%;
+            height: 100%;
+            border:0px solid;
+            border-radius: 50%;
+        }
+
+        .speech-bubble {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 11.5px;
+            padding: 10px;
+            margin-top:35%;
+            margin-left: 10%;
+            box-shadow: 0 5px 5px rgba(0, 0, 0, 0.9);
+            max-width: 200px;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            text-align: center;
+        }
+
+        .wrapper {
+        border-radius: 2px;
+        box-sizing: border-box;
+        text-align: center;
+
+    }
+
+    .input {
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid #000;
+        color: #000;
+        box-sizing: border-box;
+        font-family: 'Arvo';
+        font-size: 18px;
+        height: 50px;
+        width: 100%;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    input::placeholder {
+        color: rgba(0, 0, 0, 0.7);
+    }
+
+    input:focus::placeholder {
+        color: dodgerblue;
+    }
+
+    .input:focus+.underline {
+        transform: scale(1);
+    }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .show {
+            visibility: visible;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @media screen and (max-width: 767px) {
+        .input {
+            font-size: 18px;
+        }
+
+        .wrapper {
+            width: 90%;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="container" id="grid">
+    <table style="border-collapse: collapse; table-layout: fixed; border-width: initial; border-style: none; border-color: initial; width: 827.556px;"> 
+        <tbody> 
+        <tr> 
+        <td style="width: 163px; height: 24px; padding: 1px 6px; border-width: 3px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">노선</span></p></td> 
+        <td style="width: 58px; height: 24px; padding: 1px 6px; border-width: 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">구분</span></p></td> 
+        <td style="width: 72px; height: 24px; padding: 1px 6px; border-width: 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요일</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 24px; padding: 1px 6px; border-width: 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">운행시간</span></p></td> 
+        <td style="width: 161px; height: 24px; padding: 1px 6px; border-width: 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">승하차위치</span></p></td> 
+        <td style="width: 74.5556px; height: 24px; padding: 1px 6px; border-width: 3px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">비고</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 163px; height: 80px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">영등포</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 5,200</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 58px; height: 80px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td style="width: 72px; height: 80px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 80px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">06:50</span></p></td> 
+        <td style="width: 161px; height: 80px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">영등포역 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">5</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번 출구</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">여의도방향 한전 앞</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">스타벅스</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 74.5556px; height: 80px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교차량</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">양재</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">.</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">강남</span></p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="5" style="width: 163px; height: 106px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">교대</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 5,200</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td rowspan="3" style="width: 58px; height: 51px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td rowspan="2" style="width: 72px; height: 34px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">목</span></p></td> 
+        <td style="width: 73px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">1</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">회차</span></p></td> 
+        <td style="width: 178px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">2</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">회차</span></p></td> 
+        <td rowspan="3" style="width: 161px; height: 51px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">교대역 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">8</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,14</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번 출구 세연타워 앞</span></p></td> 
+        <td rowspan="3" style="width: 74.5556px; height: 51px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 73px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:30</span></p></td> 
+        <td style="width: 178px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">08:30</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 72px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:30</span></p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="2" style="width: 58px; height: 55px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교</span></p></td> 
+        <td style="width: 72px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">목</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">12:30, 13:30, 14:30</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">15:30, 16:30, 17:30, 18:20</span></p></td> 
+        <td rowspan="2" style="width: 161px; height: 55px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">신갈정류장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">죽전정류장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">양재</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">강남</span></p></td> 
+        <td rowspan="2" style="width: 74.5556px; height: 55px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 72px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); background: rgb(255, 255, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">14:30, 15:30, 16:30</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 163px; height: 59px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">잠실</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 5,200</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 58px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td style="width: 72px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); background: rgb(255, 255, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:00</span></p></td> 
+        <td style="width: 161px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">잠실역 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">4</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번 출구 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">롯데마트</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">전방 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">150M </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">시계탑 소화전앞</span></p></td> 
+        <td style="width: 74.5556px; height: 59px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교차량</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">양재</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">.</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">강남</span></p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="5" style="width: 163px; height: 89px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">분당</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 5.200</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td rowspan="3" style="width: 58px; height: 55px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td rowspan="2" style="width: 72px; height: 37px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">목</span></p></td> 
+        <td style="width: 73px; height: 20px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">1</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">회차</span></p></td> 
+        <td style="width: 178px; height: 20px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">2</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">회차</span></p></td> 
+        <td rowspan="3" style="width: 161px; height: 55px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">야탑역 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">4</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번 출구 택시승강장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(MG</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">새마을금고</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td rowspan="3" style="width: 74.5556px; height: 55px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 73px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:30</span></p></td> 
+        <td style="width: 178px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">08:30</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 72px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:30</span></p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="2" style="width: 58px; height: 34px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교</span></p></td> 
+        <td style="width: 72px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">목</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">14:30, 15:30 16:30, 18:20</span></p></td> 
+        <td rowspan="2" style="width: 161px; height: 34px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">죽전정류장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">서현역</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">야탑역</span></p></td> 
+        <td rowspan="2" style="width: 74.5556px; height: 34px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 72px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">16:30</span></p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="3" style="width: 163px; height: 85px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">인천</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">송내</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">:6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">7,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 58px; height: 51px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td style="width: 72px; height: 51px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 51px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">06:20(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">인천 문학경기장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">), 06:40(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">송내</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 161px; height: 51px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">문학경기장역 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">1</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번출구</span></p> 
+        <p class="0" style="line-height: 100%; text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">송내</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">남부역</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)1</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번 출구</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">바닥 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">14</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번 표시자리</span></p></td> 
+        <td style="width: 74.5556px; height: 51px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="2" style="width: 58px; height: 34px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교</span></p></td> 
+        <td style="width: 72px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">목</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">16:30, 18:20</span></p></td> 
+        <td rowspan="2" style="width: 161px; height: 34px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">송내 남부역</span></p></td> 
+        <td rowspan="2" style="width: 74.5556px; height: 34px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 72px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">16:30</span></p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="3" style="width: 163px; height: 72px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">안산</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 5,500</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 58px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td style="width: 72px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:00(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">중앙역</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">), 07:10(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">상록수역</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 161px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">중앙역 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">1</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번 출구 택시승차장</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">상록수역 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">1</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번 출구 롯데리아 앞</span></p></td> 
+        <td style="width: 74.5556px; height: 38px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="2" style="width: 58px; height: 34px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교</span></p></td> 
+        <td style="width: 72px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">목</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">16:30, 18:20</span></p></td> 
+        <td rowspan="2" style="width: 161px; height: 34px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">상록수역</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">중앙역</span></p></td> 
+        <td rowspan="2" style="width: 74.5556px; height: 34px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 72px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">16:30</span></p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="3" style="width: 163px; height: 76px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">안양</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 4,900</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 58px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td style="width: 72px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); background: rgb(255, 255, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:00(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">안양역</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">), 07:10(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">범계역</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 161px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">안양역 앞 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">1</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번가 공영주차장 앞</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">범계역 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">4</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">번출구 택시승강장</span></p></td> 
+        <td style="width: 74.5556px; height: 38px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="2" style="width: 58px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교</span></p></td> 
+        <td style="width: 72px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">목</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">16:30</span></p></td> 
+        <td rowspan="2" style="width: 161px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">신갈정류장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">범계역</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">안양역</span></p></td> 
+        <td rowspan="2" style="width: 74.5556px; height: 38px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">동수원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">경유</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 72px; height: 21px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 21px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold; color: rgb(255, 0, 0);">금요일 운행없음</span></p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="4" style="width: 163px; height: 156px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">수원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 4,900</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td rowspan="3" style="width: 58px; height: 136px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td rowspan="3" style="width: 72px; height: 136px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td style="width: 73px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">1</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">회차</span></p></td> 
+        <td style="width: 178px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">2</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">회차</span></p></td> 
+        <td rowspan="3" style="width: 161px; height: 136px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">법원사거리 쉐보레매장 앞</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">이브자리</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">영통입구 고가밑 버스정류장</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">수원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">T/G </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">입구 버스정류장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(BMW</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">매장앞</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">동탄이마트 버스정류장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">동탄</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">IC</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">방면</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        <td rowspan="3" style="width: 74.5556px; height: 136px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="2" style="width: 73px; height: 119px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:30 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">법원사거리</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:40 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">영통입구</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:45 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">수원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">T/G</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">입구</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">08:00 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">동탄이마트</span></p> 
+        <p class="0" style="font-weight: bold;">&nbsp;</p></td> 
+        <td style="width: 178px; height: 81px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">08:30 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">법원사거리</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">08:40 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">영통입구</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">08:45 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">수원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">T/G</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">입구</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">09:00 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">동탄이마트</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 178px; height: 38px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold; color: rgb(255, 0, 0);">2</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold; color: rgb(255, 0, 0);">회차 버스</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold; color: rgb(255, 0, 0);">금요일 운행없음</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 58px; height: 19px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교</span></p></td> 
+        <td style="width: 72px; height: 19px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">목</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 19px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">16:30 (</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">신갈</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">TG, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">영통입구</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">법원사거리</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 161px; height: 19px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">신갈</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">TG, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">신갈정류장</span></p></td> 
+        <td style="width: 74.5556px; height: 19px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 163px; height: 84px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">용인</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 4,900</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 58px; height: 84px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td style="width: 72px; height: 84px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 84px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:10 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: -0.5pt; font-weight: bold;">용인 컬리넌 호텔 건너편</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:15 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">삼성디지털프라자 앞</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:30 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">강남대 삼거리 굿모닝외과 건물 앞</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:35 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">신갈시외버스정류소</span></p></td> 
+        <td style="width: 161px; height: 84px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: -0.5pt; font-weight: bold;">용인 컬리넌 호텔 건너편</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: -0.5pt; font-weight: bold;">명지대사거리근처 삼성디지털 앞</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: -0.5pt; font-weight: bold;">강남대 삼거리 굿모닝외과건물 앞</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: -0.5pt; font-weight: bold;">신갈 고속시외버스정류소</span></p></td> 
+        <td style="width: 74.5556px; height: 84px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교차량</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">신갈</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">간이정류장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">.</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">고속도로</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 163px; height: 59px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">수원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">병점</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 4,600</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">))</span></p></td> 
+        <td style="width: 58px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td style="width: 72px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:00 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">수원역</span></p> 
+        <p class="0" style="word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:15 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">병점</span></p></td> 
+        <td style="width: 161px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">수원역 파출소 우측 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">50m </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">앞</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">병점 홈플러스 버스정류장</span></p></td> 
+        <td style="width: 74.5556px; height: 59px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교차량</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">운행없음</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 163px; height: 59px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">오산</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">, </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">평택</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 4,600</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">))</span></p></td> 
+        <td style="width: 58px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td style="width: 72px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); background: rgb(255, 255, 0); vertical-align: middle;">
+        <p class="0" style="word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:30 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">오산</span></p> 
+        <p class="0" style="word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">08:10 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">평택</span></p></td> 
+        <td style="width: 161px; height: 59px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">오산역 온누리약국 앞</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold; color: rgb(255, 0, 0);">평택대 정문입구 건너편 앞</span></p></td> 
+        <td style="width: 74.5556px; height: 59px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교차량</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">운행없음</span></p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="3" style="width: 163px; height: 81px; padding: 1px 6px; border-width: 1px 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">죽전</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 5,200</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">카드</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">현금 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">6,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td rowspan="3" style="width: 58px; height: 81px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td rowspan="3" style="width: 72px; height: 81px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td style="width: 73px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">1</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">회차</span></p></td> 
+        <td style="width: 178px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">2</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">회차</span></p></td> 
+        <td rowspan="3" style="width: 161px; height: 81px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">:</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">죽전 간이정류장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">.</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">부산방면</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">고속도로</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">:</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">죽전 간이정류장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">.</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">서울방면</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">고속도로</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td rowspan="3" style="width: 74.5556px; height: 81px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교차량</span></p>
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-size: 12pt; font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">양재</span><span style="font-size: 12pt; font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">,</span><span style="font-size: 12pt; font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">강남</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="2" style="width: 73px; height: 64px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">7:30~07:50(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">수시운행</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        <td style="width: 178px; height: 17px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">08:50~09:00(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">수시운행</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 178px; height: 46px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold; color: rgb(255, 0, 0);">2</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold; color: rgb(255, 0, 0);">회차 버스</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold; color: rgb(255, 0, 0);">금요일 운행없음</span></p></td> 
+        </tr> 
+        <tr> 
+        <td rowspan="2" style="width: 163px; height: 120px; padding: 1px 6px; border-width: 1px 1px 3px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">아산</span></p> 
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">요금</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">: 2,000</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">원</span></p></td> 
+        <td style="width: 58px; height: 99px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">등교</span></p></td> 
+        <td style="width: 72px; height: 99px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">월</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">~</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">금</span></p></td> 
+        <td colspan="2" style="width: 217px; height: 99px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:40 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">아산시외버스터미널</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">모종환승장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:45 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">아산</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">LG</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">전자 앞</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">07:55 </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">배방역 사거리 앞</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">08:00</span><span style="font-weight: bold; color: rgb(255, 0, 0);"> </span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">한들물빛중학교 건너편 앞</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">.</span></p></td> 
+        <td style="width: 161px; height: 99px; padding: 1px 6px; border-width: 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">.</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">아산시외버스터미널</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">(</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">모종환승장</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">)</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">앞</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">.</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">아산이마트 옆 </span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">LG</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">전자 앞</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">.</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">배방역 사거리 천안</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">13Km</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">표지판 앞</span></p> 
+        <p class="0"><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">.</span><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">한들물빛중학교 건너편 육교 앞</span></p></td> 
+        <td style="width: 74.5556px; height: 99px; padding: 1px 6px; border-width: 1px 3px 1px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="line-height: 130%; margin-left: 2px; text-indent: -2pt;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">승차권</span></p> 
+        <p class="0" style="line-height: 130%; margin-left: 2px; text-indent: -2pt;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">구입은</span></p> 
+        <p class="0" style="line-height: 130%; margin-left: 2px; text-indent: -2pt;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">진리관</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: 0pt; font-weight: bold;">CU</span><span style="font-family: &#39;문체부 바탕체&#39;; letter-spacing: -0.2pt; font-weight: bold;">편의점 앞</span></p> 
+        <p class="0" style="line-height: 130%; margin-left: 2px; text-indent: -2pt;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">발권기</span></p></td> 
+        </tr> 
+        <tr> 
+        <td style="width: 58px; height: 20px; padding: 1px 6px; border-width: 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold;">하교</span></p></td> 
+        <td style="width: 72px; height: 20px; padding: 1px 6px; border-width: 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        <td colspan="2" style="width: 217px; height: 20px; padding: 1px 6px; border-width: 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="text-align: center; word-break: keep-all;"><span style="font-family: &#39;문체부 바탕체&#39;; font-weight: bold; color: rgb(255, 0, 0);">하교차량 없음</span></p></td> 
+        <td style="width: 161px; height: 20px; padding: 1px 6px; border-width: 1px 1px 3px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="word-break: keep-all; font-weight: bold;">&nbsp;</p></td> 
+        <td style="width: 74.5556px; height: 20px; padding: 1px 6px; border-width: 1px 3px 3px 1px; border-style: solid; border-color: rgb(0, 0, 0); vertical-align: middle;">
+        <p class="0" style="line-height: 130%; margin-left: 2px; text-indent: -2pt; font-weight: bold;">&nbsp;</p></td> 
+        </tr> 
+        </tbody> 
+        </table>
+
+        <!--robot 이미지 넣는 곳-->
+        <div class="center-content">
+            <div id="robot-container">
+                <img id="robot-image" src="robot.png" style="width: 75px;" alt="Robot">
+                <div class="wrapper" style="margin-bottom:-65px;">
+                    <input class="input" placeholder="백석대 <=> 잠실역" type="text" id="destination-input">
+                    <span class="underline"></span>
+                </div>
+                <div class="speech-bubble" id="speech-bubble"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        /*robot container*/
+        const robotImage = document.getElementById('robot-image');
+        const speechBubble = document.getElementById('speech-bubble');
+        const sentences = [
+            '',
+            '오늘은 목요일 입니다.',
+            '백석대에서 <=> 잠실역',
+            '노선도 입니다.',
+        ];
+
+        let index = 0;
+
+        setInterval(() => {
+            speechBubble.classList.remove('show');
+            setTimeout(() => {
+                index = (index + 1) % sentences.length;
+                speechBubble.innerText = sentences[index];
+                speechBubble.classList.add('show');
+            }, 500);
+        }, 2500);
+        </script>
+</body>
+</html>
