@@ -52,16 +52,6 @@ app.use(session({
     }
 }));
 
-let translations = {};
-fs.readFile(path.join(__dirname, 'public', 'translations.json'), (err, data) => {
-    if (err) throw err;
-    translations = JSON.parse(data);
-});
-
-function translate(lang, text) {
-    return translations[lang][text] || text;
-}
-
 // 요일 이름 변환 함수
 function getKoreanDayName(date) {
     const days = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
@@ -102,7 +92,7 @@ app.post('/login', (req, res) => {
                     if (err) return res.json({ success: false, message: '서버 오류' });
                     if (result) {
                         req.session.loggedin = true;
-                        req.session.student_id = results[0].id; // 세션에 student_id 저장
+                        req.session.student_id = results[0].id;  // 세션에 student_id 저장
                         req.session.student_number = student_number;
                         req.session.loginTime = new Date();
                         res.json({ success: true, student_number: student_number });
@@ -169,22 +159,26 @@ app.post('/reserve-seat', (req, res) => {
     if (req.session.loggedin) {
         const { departure, date, time, seat_number } = req.body;
         const student_id = req.session.student_id;
-        const currentYear = new Date().getFullYear(); // 현재 년도 가져오기
-        const reservationDate = `${currentYear}-${date}`; // 현재 연도와 사용자가 선택한 월-일 결합
 
-        const dateObj = new Date(reservationDate);
-        const dayName = getKoreanDayName(dateObj); // 요일 이름 변환
+        const dateObj = new Date(date);
+        const dayName = getKoreanDayName(dateObj);
 
         const busQuery = 'SELECT Busid FROM Bus WHERE Buslocation = ? AND Busday = ? AND Bustime = ?';
         db.query(busQuery, [departure, dayName, time], (err, results) => {
-            if (err) return res.json({ success: false, message: '버스 조회 실패' });
+            if (err) {
+                console.error('버스 조회 실패:', err);
+                return res.json({ success: false, message: '버스 조회 실패' });
+            }
             if (results.length === 0) {
                 return res.json({ success: false, message: '해당 조건에 맞는 버스를 찾을 수 없습니다' });
             }
             const busid = results[0].Busid;
             db.query('INSERT INTO reservations (student_id, busid, seat_number, reservation_date, reservation_time) VALUES (?, ?, ?, ?, ?)',
-                [student_id, busid, seat_number, reservationDate, time], (err, result) => {
-                if (err) return res.json({ success: false, message: '예약 실패' });
+                [student_id, busid, seat_number, date, time], (err, result) => {
+                if (err) {
+                    console.error('예약 실패:', err);
+                    return res.json({ success: false, message: '예약 실패' });
+                }
                 res.json({ success: true, message: '좌석 예약 성공' });
             });
         });

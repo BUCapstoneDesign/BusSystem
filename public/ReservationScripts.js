@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = departureDateInput.value;
         const time = departureTimeInput.value;
         const seatNumber = selectedSeat.getAttribute('data-seat');
+
         fetch('/reserve-seat', {
             method: 'POST',
             headers: {
