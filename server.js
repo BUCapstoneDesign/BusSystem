@@ -161,10 +161,10 @@ app.post('/reserve-seat', (req, res) => {
     if (req.session.loggedin) {
         const { departure, date, time, seat_number } = req.body;
         const student_id = req.session.student_id;
-        const currentYear = new Date().getFullYear(); // 현재 년도 가져오기
-        const reservationDate = `${currentYear}-${date}`; // 현재 연도와 사용자가 선택한 월-일 결합
+        const busDay = getDayOfWeek(new Date(date)); // 선택한 날짜의 요일을 구함
+
         const busQuery = 'SELECT Busid FROM Bus WHERE Buslocation = ? AND Busday = ? AND Bustime = ?';
-        db.query(busQuery, [departure, reservationDate, time], (err, results) => {
+        db.query(busQuery, [departure, busDay, time], (err, results) => {
             if (err) return res.json({ success: false, message: '버스 조회 실패' });
             if (results.length === 0) {
                 return res.json({ success: false, message: '해당 조건에 맞는 버스를 찾을 수 없습니다' });
@@ -180,6 +180,12 @@ app.post('/reserve-seat', (req, res) => {
         res.json({ success: false, message: '로그인 필요' });
     }
 });
+
+// 요일 이름 반환 함수
+function getDayOfWeek(date) {
+    const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    return days[date.getDay()];
+}
 
 // 예약된 좌석 조회
 app.get('/reserved-seats', (req, res) => {
