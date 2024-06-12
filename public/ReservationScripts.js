@@ -10,13 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const seats = document.querySelectorAll('.seat');
     let selectedSeat = null;
     let reservedSeats = [];
-
     // 요일을 반환하는 함수
     function getDayOfWeek(date) {
         const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
         return days[date.getDay()];
     }
-
     // 주말을 제외한 날짜 선택 처리
     departureDateInput.addEventListener('input', () => {
         const selectedDate = new Date(departureDateInput.value);
@@ -27,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchBusTimes(departureSelect.value, selectedDate);
         }
     });
-
     // 선택한 날짜의 요일에 맞는 버스 시간을 가져오는 함수
     function fetchBusTimes(departure, date) {
         const dayOfWeek = getDayOfWeek(date);
@@ -42,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => console.error('Error fetching bus times:', error));
     }
-
     // 버스 시간을 업데이트하는 함수
     function updateBusTimes(times) {
         departureTimeInput.innerHTML = ''; // 기존 옵션을 초기화합니다.
@@ -66,19 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
         seatSelectionModal.style.display = 'block';
         fetchReservedSeats();
     });
-
     // 모달 닫기 핸들러
     closeModal.addEventListener('click', () => {
         seatSelectionModal.style.display = 'none';
     });
-
     // 모달 외부 클릭 시 닫기
     window.addEventListener('click', (event) => {
         if (event.target == seatSelectionModal) {
             seatSelectionModal.style.display = 'none';
         }
     });
-
     // 좌석 선택 로직
     seats.forEach(seat => {
         seat.addEventListener('click', () => {
@@ -92,26 +85,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
     // 선택된 좌석 수 업데이트
     function updateSelectedSeatsCount() {
         const selectedSeats = document.querySelectorAll('.seat.selected');
         selectedSeatsCount.textContent = `선택된 좌석: ${selectedSeats.length}`;
     }
-
     // "예약" 버튼 클릭 핸들러
     reserveButton.addEventListener('click', () => {
         if (!selectedSeat) {
             alert('좌석을 선택하세요.');
             return;
         }
-
         const departure = departureSelect.value;
         const arrival = document.getElementById('arrival').value;
         const date = departureDateInput.value;
         const time = departureTimeInput.value;
         const seatNumber = selectedSeat.getAttribute('data-seat');
-
         fetch('/reserve-seat', {
             method: 'POST',
             headers: {
@@ -137,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error during reservation:', error));
     });
-
     // 예약된 좌석을 가져오는 함수
     function fetchReservedSeats() {
         const reservationDate = departureDateInput.value;
@@ -150,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => console.error('Error fetching reserved seats:', error));
     }
-
     // 좌석 UI 업데이트
     function updateSeats() {
         seats.forEach(seat => {
