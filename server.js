@@ -145,7 +145,7 @@ app.get('/reservation', (req, res) => {
 app.get('/user-info', (req, res) => {
     if (req.session.loggedin) {
         const query = `
-            SELECT r.reservation_id, r.seat_number, r.reservation_date, r.reservation_time, s.Buslocation
+            SELECT r.reservation_id, r.seat_number, DATE_FORMAT(r.reservation_date, '%Y-%m-%d') as reservation_date, r.reservation_time, s.Buslocation
             FROM reservations r
             JOIN Bus s ON r.busid = s.Busid
             WHERE r.student_id = ?
@@ -159,7 +159,7 @@ app.get('/user-info', (req, res) => {
             });
         });
     } else {
-        res.json({ error: '로그인 필요' });
+        res.json({});
     }
 });
 
@@ -169,11 +169,10 @@ app.post('/reserve-seat', (req, res) => {
         const { departure, date, time, seat_number } = req.body;
         const student_id = req.session.student_id;
 
-        // 버스를 조회하는 쿼리
         const busQuery = 'SELECT Busid FROM Bus WHERE Buslocation = ? AND Busday = ? AND Bustime = ?';
 
         const dateObj = new Date(date);
-        const dayName = getKoreanDayName(dateObj);  // 요일 이름 변환
+        const dayName = getKoreanDayName(dateObj);
 
         db.query(busQuery, [departure, dayName, time], (err, results) => {
             if (err) return res.json({ success: false, message: '버스 조회 실패' });
@@ -184,16 +183,14 @@ app.post('/reserve-seat', (req, res) => {
 
             const busid = results[0].Busid;
 
-            // 중복 예약 확인 쿼리
-            const checkDuplicateQuery = 'SELECT * FROM reservations WHERE student_id = ? AND busid = ? AND seat_number = ? AND reservation_date = ? AND reservation_time = ?';
-            db.query(checkDuplicateQuery, [student_id, busid, seat_number, date, time], (err, duplicateResults) => {
+            const checkDuplicateQuery = 'SELECT * FROM reservations WHERE busid = ? AND seat_number = ? AND reservation_date = ? AND reservation_time = ?';
+            db.query(checkDuplicateQuery, [busid, seat_number, date, time], (err, duplicateResults) => {
                 if (err) return res.json({ success: false, message: '중복 예약 확인 실패' });
 
                 if (duplicateResults.length > 0) {
                     return res.json({ success: false, message: '이미 예약된 좌석입니다' });
                 }
 
-                // 예약을 저장하는 쿼리
                 db.query(
                     'INSERT INTO reservations (student_id, busid, seat_number, reservation_date, reservation_time) VALUES (?, ?, ?, ?, ?)',
                     [student_id, busid, seat_number, date, time],
