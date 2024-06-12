@@ -105,13 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('좌석을 선택하세요.');
             return;
         }
-
         const departure = departureSelect.value;
         const arrival = document.getElementById('arrival').value;
         const date = departureDateInput.value;
         const time = departureTimeInput.value;
         const seatNumber = selectedSeat.getAttribute('data-seat');
-
         fetch('/reserve-seat', {
             method: 'POST',
             headers: {
@@ -158,9 +156,99 @@ document.addEventListener('DOMContentLoaded', () => {
             if (reservedSeats.includes(seatNumber)) {
                 seat.classList.add('reserved');
                 seat.classList.remove('selected');
+                seat.removeEventListener('click', selectSeat);
             } else {
                 seat.classList.remove('reserved');
+                seat.addEventListener('click', selectSeat);
             }
         });
     }
+
+    // 좌석 선택 함수
+    function selectSeat() {
+        if (!this.classList.contains('reserved')) {
+            if (selectedSeat) {
+                selectedSeat.classList.remove('selected');
+            }
+            this.classList.add('selected');
+            selectedSeat = this;
+            updateSelectedSeatsCount();
+        }
+    }
+
+    // 예약 취소 버튼 이벤트 핸들러
+    function addCancelHandler(cancelButton, reservationId) {
+        cancelButton.addEventListener('click', () => {
+            if (confirm('정말 이 예약을 취소하시겠습니까?')) {
+                cancelReservation(reservationId);
+            }
+        });
+    }
+
+    function fetchReservations() {
+        fetch('/user-info')
+            .then(response => response.json())
+            .then(data => {
+                if (data.reservations) {
+                    const reservationList = document.getElementById('reservation-list');
+                    reservationList.innerHTML = ''; // 기존 예약 목록 초기화
+
+                    data.reservations.forEach(reservation => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${reservation.Buslocation} - ${formatDate(reservation.reservation_date)} - ${reservation.reservation_time} - ${reservation.seat_number}`;
+                        const cancelButton = document.createElement('button');
+                        cancelButton.textContent = '취소';
+                        addCancelHandler(cancelButton, reservation.reservation_id);
+                        listItem.appendChild(cancelButton);
+                        reservationList.appendChild(listItem);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching reservations:', error));
+    }
+
+    // 예약 취소 함수
+    function cancelReservation(reservationId) {
+        fetch('/cancel-reservation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reservation_id: reservationId })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert('예약이 취소되었습니다.');
+                fetchReservations(); // 예약 목록을 새로 고침
+            } else {
+                alert(`예약 취소 실패: ${result.message}`);
+            }
+        })
+        .catch(error => console.error('Error during cancellation:', error));
+    }
+
+    // 날짜 형식화 함수
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        return new Date(dateString).toLocaleDateString('ko-KR', options);
+    }
+
+    // 내 정보 보기 버튼 클릭 이벤트
+    document.getElementById('info-button').addEventListener('click', () => {
+        userInfoModal.style.display = 'block';
+        fetchReservations(); // 예약 목록을 가져옴
+    });
+
+    // 모달 닫기 이벤트
+    document.getElementsByClassName('close')[0].addEventListener('click', () => {
+        userInfoModal.style.display = 'none';
+    });
+
+    // 모달 외부 클릭 시 닫기
+    window.onclick = function (event) {
+        if (event.target == userInfoModal) {
+            userInfoModal.style.display = 'none';
+        }
+    };
 });

@@ -106,7 +106,7 @@
     <!-- 내 정보 모달 -->
     <div id="info-modal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close" onclick="closeInfoModal()">&times;</span>
             <h2 id="info-title" data-translate="info_title">내 정보</h2>
             <p id="student-number"></p>
             <p id="login-time"></p>
@@ -120,8 +120,8 @@
     <!-- BusTimeTable 팝업 -->
     <div id="timetable-modal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <img src="BusTimeTable.png" alt="전체 시간표">
+            <span class="close" onclick="closeBusTimetable()">&times;</span>
+            <img src="BusTimeTable.png" alt="전체 시간표" style="width: 100%; height: auto;">
         </div>
     </div>
 
@@ -153,17 +153,62 @@
         function openBusTimetable() {
             const modal = document.getElementById('timetable-modal');
             modal.style.display = 'block';
+        }
 
-            const closeBtn = document.getElementsByClassName('close')[0];
-            closeBtn.onclick = function() {
-                modal.style.display = 'none';
-            };
+        // 팝업 닫기 함수
+        function closeBusTimetable() {
+            const modal = document.getElementById('timetable-modal');
+            modal.style.display = 'none';
+        }
 
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            };
+        // 내 정보 모달 닫기 함수
+        function closeInfoModal() {
+            const modal = document.getElementById('info-modal');
+            modal.style.display = 'none';
+        }
+
+        // 내 정보 가져오기
+        document.getElementById('info-button').addEventListener('click', function () {
+            fetch('/user-info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        document.getElementById('student-number').textContent = `학번: ${data.student_number}`;
+                        document.getElementById('login-time').textContent = `로그인 일시: ${new Date(data.loginTime).toLocaleString()}`;
+                        const reservationList = document.getElementById('reservation-list');
+                        reservationList.innerHTML = '';
+                        data.reservations.forEach(reservation => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `날짜: ${reservation.reservation_date}, 시간: ${reservation.reservation_time}, 좌석: ${reservation.seat_number} 
+                                <button onclick="cancelReservation(${reservation.reservation_id})">취소</button>`;
+                            reservationList.appendChild(li);
+                        });
+                        document.getElementById('info-modal').style.display = 'block';
+                    }
+                });
+        });
+
+        // 예약 취소 함수
+        function cancelReservation(reservation_id) {
+            fetch('/cancel-reservation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reservation_id })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        alert('예약이 취소되었습니다.');
+                        location.reload();  // 페이지 새로고침하여 변경사항 반영
+                    } else {
+                        alert(`예약 취소 실패: ${result.message}`);
+                    }
+                })
+                .catch(error => console.error('Error during cancellation:', error));
         }
     </script>
     <script src="MainScript.js"></script>
