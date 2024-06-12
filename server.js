@@ -101,7 +101,7 @@ app.post('/login', (req, res) => {
                     if (err) return res.json({ success: false, message: '서버 오류' });
                     if (result) {
                         req.session.loggedin = true;
-                        req.session.student_id = results[0].id; // 세션에 student_id 저장
+                        req.session.Studentsid = results[0].Studentsid; // 세션에 Studentsid 저장
                         req.session.student_number = student_number;
                         req.session.loginTime = new Date();
                         res.json({ success: true, student_number: student_number });
@@ -148,9 +148,9 @@ app.get('/user-info', (req, res) => {
             SELECT r.reservation_id, r.seat_number, DATE_FORMAT(r.reservation_date, '%Y-%m-%d') as reservation_date, r.reservation_time, s.Buslocation
             FROM reservations r
             JOIN Bus s ON r.busid = s.Busid
-            WHERE r.student_id = ?
+            WHERE r.Studentsid = ?
         `;
-        db.query(query, [req.session.student_id], (err, results) => {
+        db.query(query, [req.session.Studentsid], (err, results) => {
             if (err) throw err;
             res.json({
                 student_number: req.session.student_number,
@@ -167,7 +167,7 @@ app.get('/user-info', (req, res) => {
 app.post('/reserve-seat', (req, res) => {
     if (req.session.loggedin) {
         const { departure, date, time, seat_number } = req.body;
-        const student_id = req.session.student_id;
+        const Studentsid = req.session.Studentsid;
 
         const busQuery = 'SELECT Busid FROM Bus WHERE Buslocation = ? AND Busday = ? AND Bustime = ?';
 
@@ -192,8 +192,8 @@ app.post('/reserve-seat', (req, res) => {
                 }
 
                 db.query(
-                    'INSERT INTO reservations (student_id, busid, seat_number, reservation_date, reservation_time) VALUES (?, ?, ?, ?, ?)',
-                    [student_id, busid, seat_number, date, time],
+                    'INSERT INTO reservations (Studentsid, busid, seat_number, reservation_date, reservation_time) VALUES (?, ?, ?, ?, ?)',
+                    [Studentsid, busid, seat_number, date, time],
                     (err, result) => {
                         if (err) return res.json({ success: false, message: '예약 실패' });
                         res.json({ success: true, message: '좌석 예약 성공' });
@@ -220,8 +220,8 @@ app.get('/reserved-seats', (req, res) => {
 app.post('/cancel-reservation', (req, res) => {
     if (req.session.loggedin) {
         const { reservation_id } = req.body;
-        const student_id = req.session.student_id;
-        db.query('DELETE FROM reservations WHERE reservation_id = ? AND student_id = ?', [reservation_id, student_id], (err, result) => {
+        const Studentsid = req.session.Studentsid;
+        db.query('DELETE FROM reservations WHERE reservation_id = ? AND Studentsid = ?', [reservation_id, Studentsid], (err, result) => {
             if (err) {
                 console.error('예약 취소 실패:', err);
                 return res.json({ success: false, message: '예약 취소 실패' });
