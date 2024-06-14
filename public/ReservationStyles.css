@@ -1,17 +1,7 @@
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
-h1 {
-  margin-bottom: 20px;
-  text-align: center;
+  font-family: Arial, sans-serif;
+  background-color: #F6F6F6;
 }
 
 .container {
@@ -50,9 +40,8 @@ header {
   font-size: 20px;
   text-decoration: none;
   cursor: pointer;
-  padding: 10px 50px;
+  padding: 10px 20px;
   border-radius: 5px;
-  margin-left: 30px;
   transition: background-color 0.5s ease;
 }
 
@@ -60,102 +49,97 @@ header {
   background-color: #002244;
 }
 
-.reservation-form {
+.MainBackground {
+  position: relative;
   width: 100%;
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: white;
-  border: 1px solid #ddd;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  height: 100%;
 }
 
-.form-group {
-  margin-bottom: 30px;
-}
-
-.form-group label {
+.MainBackground .main-img {
+  width: 100%;
+  height: auto;
   display: block;
-  margin-bottom: 15px;
-  font-weight: bold;
+  opacity: 0.4;
 }
 
-select, input[type="date"], input[type="time"], button {
-  width: calc(100% - 20px);
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
+.buttons {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translate(-30%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-button {
+.buttons button {
   background-color: #003366;
+  border-style: solid;
+  border-color: white;
+  border-width: 2px;
+  border-radius: 20px;
   color: white;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 30px 60px;
+  font-size: 20px;
   cursor: pointer;
+  transition: background-color 0.5s ease;
 }
 
-button:hover {
+.buttons button:hover {
   background-color: #002244;
 }
 
-.bus {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.seat, .passage {
-  width: 40px;
-  height: 40px;
-  margin: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #000;
-  cursor: pointer;
-  user-select: none;
+.notice {
+  position: absolute;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+  width: 40%;
+  height: 80%;
+  top: 50%;
+  left: 70%;
+  transform: translate(0, -50%);
+  background-color: #EEEEEE;
+  padding: 10px;
   border-radius: 5px;
 }
 
-.seat {
-  background-color: #fff;
-  transition: background-color 0.3s ease;
+.notice h3 {
+  margin-top: 10px;
 }
 
-.seat.selected {
-  background-color: #6c6;
+.notice-content {
+  background-color: white;
+  position: relative;
+  height: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-y: auto;
 }
 
-.seat.reserved {
-  background-color: #f00;
-  cursor: not-allowed;
+.notice-content p {
+  margin: 5px;
 }
 
-
-.seat:hover {
-  background-color: #ddd;
+.notice-content table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.passage {
-  width: 40px;
-  border: none;
-  cursor: default;
-  background-color: #f4f4f4;
+.notice-content th, .notice-content td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
 }
 
-.passage.long {
-  width: 160px; /* Adjusted to make a longer passage */
+.notice-content th {
+  background-color: #f2f2f2;
 }
 
-/* Modal 스타일 */
+/* ... 기존 스타일 ... */
+
 .modal {
   display: none; 
   position: fixed; 
@@ -171,7 +155,7 @@ button:hover {
 
 .modal-content {
   background-color: #fefefe;
-  margin: 10% auto; 
+  margin: 15% auto; 
   padding: 20px;
   border: 1px solid #888;
   width: 80%; 
@@ -192,72 +176,138 @@ button:hover {
   cursor: pointer;
 }
 
-.seat-selection-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+/* ... 나머지 스타일 ... */
+
+
+.login-container {
+  text-align: left;
+}
+
+.login-container h2 {
+  font-size: 24px;
+  margin-top: 0;
+  color: #003366;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 18px;
+  color: #003366;
+}
+
+.form-group input {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+button {
   width: 100%;
-}
-
-.seat.reserved {
-  background-color: red;
-  cursor: not-allowed;
-}
-
-.seat.user-reserved {
-  background-color: red;
-  cursor: not-allowed;
-}
-
-
-.seat-selection-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
+  padding: 15px;
   background-color: #003366;
   color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+button:hover {
+  background-color: #002244;
+}
+
+#message {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* 이전 스타일 유지 */
+
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 1; 
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; 
+  background-color: rgb(0,0,0); 
+  background-color: rgba(0,0,0,0.4); 
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; 
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
   border-radius: 10px;
 }
 
-.seat-selection-info h3 {
-  margin-top: 0;
-  font-size: 24px;
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
 }
 
-#selected-seats-count {
-  font-size: 36px;
-  margin: 20px 0;
-}
-
-#reserve-button {
-  background-color: #ffffff;
-  color: #003366;
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
   cursor: pointer;
-  padding: 15px 30px;
-  font-size: 20px;
-  border: 2px solid #003366;
+}
+
+#login-form,
+#register-form {
+  display: flex;
+  flex-direction: column;
+}
+
+#login-form .form-group,
+#register-form .form-group {
+  margin-bottom: 15px;
+}
+
+#login-form label,
+#register-form label {
+  margin-bottom: 5px;
+}
+
+#login-form input,
+#register-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-#reserve-button:hover {
+#login-form button,
+#register-form button {
+  padding: 10px;
   background-color: #003366;
-  color: #ffffff;
-}
-
-.styled-button {
-  background-color: #ffffff;
-  color: #003366;
+  color: white;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
-  padding: 15px 30px;
-  font-size: 20px;
-  border: 2px solid #003366;
-  border-radius: 5px;
-  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-.styled-button:hover {
-  background-color: #003366;
-  color: #ffffff;
+#login-form button:hover,
+#register-form button:hover {
+  background-color: #002244;
+}
+
+#login-message,
+#register-message {
+  margin-top: 10px;
 }
