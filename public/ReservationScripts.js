@@ -7,9 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModal = document.getElementsByClassName('close')[0];
     const reserveButton = document.getElementById('reserve-button');
     const selectedSeatsCount = document.getElementById('selected-seats-count');
-    const seats = document.querySelectorAll('.seat'); // seats 변수를 올바르게 정의
+    const seats = document.querySelectorAll('.seat');
     let selectedSeat = null;
     let reservedSeats = [];
+    let userReservedSeats = [];
 
     // 요일을 반환하는 함수
     function getDayOfWeek(date) {
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 좌석 선택 로직
     seats.forEach(seat => {
         seat.addEventListener('click', () => {
-            if (!seat.classList.contains('reserved')) {
+            if (!seat.classList.contains('reserved') && !seat.classList.contains('user-reserved')) {
                 if (selectedSeat) {
                     selectedSeat.classList.remove('selected');
                 }
@@ -110,6 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = departureDateInput.value;
         const time = departureTimeInput.value;
         const seatNumber = selectedSeat.getAttribute('data-seat');
+        
+        // 여기서 date 값을 로그로 확인
+        console.log('예약 날짜:', date);
+    
         fetch('/reserve-seat', {
             method: 'POST',
             headers: {
@@ -135,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error during reservation:', error));
     });
-
+    
     // 예약된 좌석을 가져오는 함수
     function fetchReservedSeats() {
         const reservationDate = departureDateInput.value;
@@ -144,9 +149,21 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 reservedSeats = data;
-                updateSeats();
+                fetchUserReservedSeats(); // 사용자 예약 좌석도 가져와야 함
             })
             .catch(error => console.error('Error fetching reserved seats:', error));
+    }
+
+    function fetchUserReservedSeats() {
+        fetch('/user-info')
+            .then(response => response.json())
+            .then(data => {
+                if (data.reservations) {
+                    userReservedSeats = data.reservations.map(reservation => reservation.seat_number);
+                    updateSeats();
+                }
+            })
+            .catch(error => console.error('Error fetching user reserved seats:', error));
     }
 
     // 좌석 UI 업데이트
@@ -157,8 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 seat.classList.add('reserved');
                 seat.classList.remove('selected');
                 seat.removeEventListener('click', selectSeat);
+            } else if (userReservedSeats.includes(seatNumber)) {
+                seat.classList.add('user-reserved');
+                seat.classList.remove('selected');
+                seat.removeEventListener('click', selectSeat);
             } else {
-                seat.classList.remove('reserved');
+                seat.classList.remove('reserved', 'user-reserved');
                 seat.addEventListener('click', selectSeat);
             }
         });
@@ -166,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 좌석 선택 함수
     function selectSeat() {
-        if (!this.classList.contains('reserved')) {
+        if (!this.classList.contains('reserved') && !this.classList.contains('user-reserved')) {
             if (selectedSeat) {
                 selectedSeat.classList.remove('selected');
             }
@@ -221,6 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 alert('예약이 취소되었습니다.');
                 fetchReservations(); // 예약 목록을 새로 고침
+                fetchReservedSeats(); // 좌석 상태를 새로 고침
             } else {
                 alert(`예약 취소 실패: ${result.message}`);
             }
