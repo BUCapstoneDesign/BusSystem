@@ -111,6 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = departureDateInput.value;
         const time = departureTimeInput.value;
         const seatNumber = selectedSeat.getAttribute('data-seat');
+        
+        // 여기서 date 값을 로그로 확인
+        console.log('예약 날짜:', date);
+    
         fetch('/reserve-seat', {
             method: 'POST',
             headers: {
@@ -136,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error during reservation:', error));
     });
-
+    
     // 예약된 좌석을 가져오는 함수
     function fetchReservedSeats() {
         const reservationDate = departureDateInput.value;

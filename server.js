@@ -195,10 +195,14 @@ app.post('/reserve-seat', (req, res) => {
                     'INSERT INTO reservations (Studentsid, busid, seat_number, reservation_date, reservation_time) VALUES (?, ?, ?, ?, ?)',
                     [Studentsid, busid, seat_number, date, time],
                     (err, result) => {
-                        if (err) return res.json({ success: false, message: '예약 실패' });
+                        if (err) {
+                            console.error('예약 실패:', err);
+                            return res.json({ success: false, message: '예약 실패' });
+                        }
+                        console.log('예약된 날짜:', date); // 추가된 로그
                         res.json({ success: true, message: '좌석 예약 성공' });
                     }
-                );
+                );  
             });
         });
     } else {
