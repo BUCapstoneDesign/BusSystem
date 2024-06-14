@@ -199,6 +199,17 @@ button:hover {
   width: 100%;
 }
 
+.seat.reserved {
+  background-color: red;
+  cursor: not-allowed;
+}
+
+.seat.user-reserved {
+  background-color: red;
+  cursor: not-allowed;
+}
+
+
 .seat-selection-info {
   display: flex;
   flex-direction: column;
