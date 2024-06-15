@@ -114,10 +114,9 @@
                 <h3 id="reservations-title" data-translate="reservations_title">예약된 좌석</h3>
                 <ul id="reservation-list"></ul>
             </div>
+            <div id="qr-code-container" class="qr-code-container"></div> <!-- QR 코드 컨테이너 추가 -->
         </div>
     </div>
-
-    <!-- BusTimeTable 팝업 제거 -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -158,7 +157,8 @@
                                     userInfo.reservations.forEach(reservation => {
                                         const li = document.createElement('li');
                                         li.innerHTML = `날짜: ${reservation.reservation_date}, 시간: ${reservation.reservation_time}, 좌석: ${reservation.seat_number} 
-                                            <button onclick="cancelReservation(${reservation.reservation_id})">취소</button>`;
+                                            <button onclick="cancelReservation(${reservation.reservation_id})">취소</button>
+                                            <button onclick="generateQRCode(${reservation.reservation_id})">QR 코드 생성</button>`; // QR 코드 생성 버튼 추가
                                         reservationList.appendChild(li);
                                     });
                                 }
@@ -189,6 +189,30 @@
                 })
                 .catch(error => console.error('Error during cancellation:', error));
             }
+
+            // QR 코드 생성 함수 추가
+            window.generateQRCode = function (reservationId) {
+                fetch('/generate-qr', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reservationId })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        const qrCodeContainer = document.getElementById('qr-code-container');
+                        qrCodeContainer.innerHTML = ''; // 기존 QR 코드를 지웁니다
+                        const qrCodeImage = document.createElement('img');
+                        qrCodeImage.src = result.qrCode;
+                        qrCodeContainer.appendChild(qrCodeImage);
+                    } else {
+                        alert(`QR 코드 생성 실패: ${result.message}`);
+                    }
+                })
+                .catch(error => console.error('Error generating QR code:', error));
+            };
 
             // 새 탭에서 이미지 열기 함수
             window.openBusTimetable = function () {
