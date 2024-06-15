@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
     const infoButton = document.getElementById('info-button');
     const reservationButton = document.getElementById('reservation-button');
     const loginModal = document.getElementById('login-modal');
@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const studentNumberP = document.getElementById('student-number');
     const loginTimeP = document.getElementById('login-time');
     const reservationList = document.getElementById('reservation-list');
-    let reservedSeats = [];
 
     // Handle "내 정보" button click
     infoButton.addEventListener('click', () => {
@@ -164,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     // qr 관련
     function fetchReservations() {
         fetch('/user-info')
@@ -212,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const qrCodeImage = document.createElement('img');
                 qrCodeImage.src = result.qrCode;
                 const qrCodeContainer = document.createElement('div');
-                qrCodeContainer.classList.add('qr-code-container');
+                qrCodeContainer.classList.add('qr-code-container'); // 스타일을 적용하기 위해 클래스 추가
                 qrCodeContainer.appendChild(qrCodeImage);
                 document.body.appendChild(qrCodeContainer);
             } else {
@@ -222,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => console.error('Error generating QR code:', error));
     }
     
-
     // Handle seat selection
     seats.forEach(seat => {
         seat.addEventListener('click', () => {
@@ -309,6 +306,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            // QR 코드 생성 버튼 추가
+            const qrButton = document.createElement('button');
+            qrButton.textContent = 'QR 코드 생성';
+            qrButton.addEventListener('click', () => generateQRCode(reservation.reservation_id));
+
+            listItem.appendChild(qrButton);
             listItem.appendChild(cancelButton);
             reservationList.appendChild(listItem);
         });

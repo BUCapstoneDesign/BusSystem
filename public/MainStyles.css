@@ -126,6 +126,8 @@ header {
   background-color: #f2f2f2;
 }
 
+/* ... 기존 스타일 ... */
+
 /* 팝업 모달 스타일 */
 .modal {
   display: none; 
@@ -233,6 +235,8 @@ header {
   padding: 10px;
   border-radius: 10px;
 }
+
+/* ... 나머지 스타일 ... */
 
 .login-container {
   text-align: left;
