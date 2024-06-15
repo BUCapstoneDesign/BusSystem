@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>승차권 예약</title>
+    <title data-translate="language">승차권 예약</title>
     <link rel="stylesheet" href="ReservationStyles.css">
 </head>
 <body>
@@ -17,7 +17,7 @@
             </div>
             <div class="language">
                 <select id="language-select" class="styled-select">
-                    <option value="ko">언어 language</option>
+                    <option value="ko" data-translate="language">언어 language</option>
                     <option value="en">English</option>
                     <option value="vi">Tiếng Việt</option>
                     <option value="zh">中文</option>
@@ -27,9 +27,9 @@
     </div>
     
     <div class="reservation-form">
-        <h1>날짜와 시간을 선택하세요</h1>
+        <h1 data-translate="select_date_time">날짜와 시간을 선택하세요</h1>
         <div class="form-group">
-            <label for="departure">출발지</label>
+            <label for="departure" data-translate="departure">출발지</label>
             <select id="departure">
                 <option value="영등포">영등포</option>
                 <option value="교대">교대</option>
@@ -40,8 +40,10 @@
                 <option value="안산">안산</option>
                 <option value="안양">안양</option>
                 <option value="수원">수원</option>
+                <option value="수원2">수원2</option>
                 <option value="용인">용인</option>
-                <option value="수원병점">수원병점</option>
+                <option value="수원역">수원역</option>
+                <option value="병점">병점</option>
                 <option value="오산">오산</option>
                 <option value="평택">평택</option>
                 <option value="죽전">죽전</option>
@@ -50,30 +52,36 @@
         </div>
 
         <div class="form-group">
-            <label for="arrival">도착지</label>
+            <label for="arrival" data-translate="arrival">도착지</label>
             <input type="text" id="arrival" placeholder="백석대학교" value="백석대학교" readonly>
         </div>
 
         <div class="form-group">
-            <label for="departure-date">출발 시각</label>
+            <label for="departure-date" data-translate="departure_date">출발 날짜</label>
             <input type="date" id="departure-date">
-            <input type="time" id="departure-time" value="12:00" readonly>
         </div>
 
         <div class="form-group">
-            <label for="children">탑승객</label>
+            <label for="departure-time" data-translate="departure_time">출발 시간</label>
+            <select id="departure-time">
+                <!-- 출발 시간이 동적으로 추가될 예정 -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="children" data-translate="children">탑승객</label>
             <select id="children" disabled>
                 <option value="1">1명</option>
             </select>
         </div>
 
-        <button id="submit" class="styled-button">승차권 예약</button>
+        <button id="submit" class="styled-button" data-translate="reservation_button">승차권 예약</button>
     </div>
 
     <div id="seat-selection-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h1>좌석을 선택하세요</h1>
+            <h1 data-translate="select_seat">좌석을 선택하세요</h1>
             <div class="seat-selection-container">
                 <div class="bus">
                     <div class="row">
@@ -155,15 +163,14 @@
                     </div>
                 </div>
                 <div class="seat-selection-info">
-                    <h3>선택된 좌석</h3>
+                    <h3 data-translate="selected_seats">선택된 좌석</h3>
                     <p id="selected-seats-count">0</p>
-                    <button id="reserve-button" class="styled-button">예약</button>
+                    <button id="reserve-button" class="styled-button" data-translate="reserve_button">예약</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="ReservationScripts.js"></script>
-    <script src="seats.js"></script>
 </body>
 </html>

@@ -1,5 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const languageSelect = document.getElementById('language-select');
+document.addEventListener('DOMContentLoaded', function () {
     const infoButton = document.getElementById('info-button');
     const reservationButton = document.getElementById('reservation-button');
     const loginModal = document.getElementById('login-modal');
@@ -16,20 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const studentNumberP = document.getElementById('student-number');
     const loginTimeP = document.getElementById('login-time');
     const reservationList = document.getElementById('reservation-list');
-    const seatSelectionModal = document.getElementById('seat-selection-modal');
-    const reserveButton = document.getElementById('reserve-button');
-    const selectedSeatsCount = document.getElementById('selected-seats-count');
-    const seats = document.querySelectorAll('.seat');
-    let reservedSeats = [];
-
-    // Set default language to Korean
-    languageSelect.value = 'ko';
-
-    // Handle language change
-    languageSelect.addEventListener('change', () => {
-        const selectedLang = languageSelect.value;
-        translatePage(selectedLang);
-    });
 
     // Handle "내 정보" button click
     infoButton.addEventListener('click', () => {
@@ -54,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 if (data.loggedIn) {
-                    location.href = 'reservation.html';
+                    location.href = 'Reservation.html';
                 } else {
                     alertModal.style.display = 'block';
                 }
@@ -178,6 +163,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // qr 관련
+    function fetchReservations() {
+        fetch('/user-info')
+            .then(response => response.json())
+            .then(data => {
+                if (data.reservations) {
+                    const reservationList = document.getElementById('reservation-list');
+                    reservationList.innerHTML = ''; // 기존 예약 목록 초기화
+    
+                    data.reservations.forEach(reservation => {
+                        const listItem = document.createElement('li');
+                        const formattedDate = formatDate(reservation.reservation_date);
+                        listItem.innerHTML = `${reservation.Buslocation} - ${formattedDate} - ${reservation.reservation_time} - ${reservation.seat_number}`;
+                        
+                        // QR 코드 생성 버튼 추가
+                        const qrButton = document.createElement('button');
+                        qrButton.textContent = 'QR 코드 생성';
+                        qrButton.addEventListener('click', () => generateQRCode(reservation.reservation_id));
+                        listItem.appendChild(qrButton);
+                        
+                        const cancelButton = document.createElement('button');
+                        cancelButton.textContent = '취소';
+                        addCancelHandler(cancelButton, reservation.reservation_id);
+                        listItem.appendChild(cancelButton);
+                        
+                        reservationList.appendChild(listItem);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching reservations:', error));
+    }
+    
+    // QR 코드 생성 함수
+    function generateQRCode(reservationId) {
+        fetch('/generate-qr', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reservationId })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                const qrCodeImage = document.createElement('img');
+                qrCodeImage.src = result.qrCode;
+                const qrCodeContainer = document.createElement('div');
+                qrCodeContainer.classList.add('qr-code-container'); // 스타일을 적용하기 위해 클래스 추가
+                qrCodeContainer.appendChild(qrCodeImage);
+                document.body.appendChild(qrCodeContainer);
+            } else {
+                alert(`QR 코드 생성 실패: ${result.message}`);
+            }
+        })
+        .catch(error => console.error('Error generating QR code:', error));
+    }
+    
     // Handle seat selection
     seats.forEach(seat => {
         seat.addEventListener('click', () => {
@@ -195,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update selected seats count
     function updateSelectedSeatsCount() {
         const selectedSeats = document.querySelectorAll('.seat.selected');
-        selectedSeatsCount.textContent = selectedSeats.length;
+        selectedSeatsCount.textContent = `선택된 좌석: ${selectedSeats.length}`;
     }
 
     // Handle reserve button click
@@ -240,13 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.student_number) {
                     studentNumberP.textContent = `학번: ${data.student_number}`;
                     loginTimeP.textContent = `로그인 일시: ${new Date(data.loginTime).toLocaleString()}`;
-                    reservationList.innerHTML = '';
-
-                    data.reservations.forEach(reservation => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `날짜: ${reservation.reservation_date}, 시간: ${reservation.reservation_time}, 좌석: ${reservation.seat_number}`;
-                        reservationList.appendChild(listItem);
-                    });
+                    renderReservationList(data.reservations);
 
                     infoModal.style.display = 'block';
                 }
@@ -254,18 +290,52 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error fetching user info:', error));
     }
 
-    // Translate page content based on selected language
-    function translatePage(lang) {
-        fetch(`/translations.json`)
-            .then(response => response.json())
-            .then(translations => {
-                const elementsToTranslate = document.querySelectorAll('[data-translate]');
-                elementsToTranslate.forEach(element => {
-                    const key = element.getAttribute('data-translate');
-                    element.textContent = translations[lang][key] || element.textContent;
-                });
-            })
-            .catch(error => console.error('Error fetching translations:', error));
+    // Render reservation list with cancel buttons
+    function renderReservationList(reservations) {
+        reservationList.innerHTML = '';
+        reservations.forEach(reservation => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `날짜: ${reservation.reservation_date}, 시간: ${reservation.reservation_time}, 좌석: ${reservation.seat_number}`;
+            
+            // 예약 취소 버튼 추가
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = '취소';
+            cancelButton.addEventListener('click', () => {
+                if (confirm('정말 취소하시겠습니까?')) {
+                    cancelReservation(reservation.reservation_id);
+                }
+            });
+
+            // QR 코드 생성 버튼 추가
+            const qrButton = document.createElement('button');
+            qrButton.textContent = 'QR 코드 생성';
+            qrButton.addEventListener('click', () => generateQRCode(reservation.reservation_id));
+
+            listItem.appendChild(qrButton);
+            listItem.appendChild(cancelButton);
+            reservationList.appendChild(listItem);
+        });
+    }
+
+    // 예약 취소 함수
+    function cancelReservation(reservation_id) {
+        fetch('/cancel-reservation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reservation_id })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert('예약이 취소되었습니다.');
+                fetchUserInfo(); // 예약 목록 갱신
+            } else {
+                alert('예약 취소 실패: ' + result.message);
+            }
+        })
+        .catch(error => console.error('Error cancelling reservation:', error));
     }
 
     // Fetch reserved seats on page load
