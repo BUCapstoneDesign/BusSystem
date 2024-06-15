@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 reservedSeats = data;
-                fetchUserReservedSeats(); // 사용자 예약 좌석도 가져와야 함
+                updateSeats();
             })
             .catch(error => console.error('Error fetching reserved seats:', error));
     }
