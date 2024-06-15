@@ -6,12 +6,9 @@ body {
 
 .container {
   display: grid;
-  width: 100%;
-  max-height: 1920px;
-  max-width: 1080px;
   margin: 0 auto;
   background-color: white;
-  border: 1px solid #ddd;
+  border: 0px solid #ddd;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
