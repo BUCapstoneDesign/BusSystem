@@ -212,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const qrCodeImage = document.createElement('img');
                 qrCodeImage.src = result.qrCode;
                 const qrCodeContainer = document.createElement('div');
+                qrCodeContainer.classList.add('qr-code-container');
                 qrCodeContainer.appendChild(qrCodeImage);
                 document.body.appendChild(qrCodeContainer);
             } else {

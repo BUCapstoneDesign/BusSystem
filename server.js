@@ -254,7 +254,6 @@ app.post('/reserve-seat', (req, res) => {
     }
 });
 
-
 // 예약된 좌석 조회
 app.get('/reserved-seats', (req, res) => {
     const { reservation_date, reservation_time } = req.query;
