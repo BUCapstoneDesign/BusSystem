@@ -49,144 +49,13 @@ header {
   background-color: #002244;
 }
 
-.MainBackground {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.MainBackground .main-img {
-  width: 100%;
-  height: auto;
-  display: block;
-  opacity: 0.4;
-}
-
-.buttons {
-  position: absolute;
-  top: 50%;
-  left: 10%;
-  transform: translate(-30%, -50%);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.buttons button {
-  background-color: #003366;
-  border-style: solid;
-  border-color: white;
-  border-width: 2px;
-  border-radius: 20px;
-  color: white;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding: 30px 60px;
-  font-size: 20px;
-  cursor: pointer;
-  transition: background-color 0.5s ease;
-}
-
-.buttons button:hover {
-  background-color: #002244;
-}
-
-.notice {
-  position: absolute;
-  display: grid;
-  grid-template-columns: auto;
-  grid-template-rows: auto;
-  width: 40%;
-  height: 80%;
-  top: 50%;
-  left: 70%;
-  transform: translate(0, -50%);
-  background-color: #EEEEEE;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.notice h3 {
-  margin-top: 10px;
-}
-
-.notice-content {
+.reservation-form {
+  text-align: center;
+  margin: 30px;
+  padding: 30px;
   background-color: white;
-  position: relative;
-  height: 100%;
-  padding: 10px;
-  border-radius: 5px;
-  overflow-y: auto;
-}
-
-.notice-content p {
-  margin: 5px;
-}
-
-.notice-content table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.notice-content th, .notice-content td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-.notice-content th {
-  background-color: #f2f2f2;
-}
-
-/* ... 기존 스타일 ... */
-
-.modal {
-  display: none; 
-  position: fixed; 
-  z-index: 1; 
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto; 
-  background-color: rgb(0,0,0); 
-  background-color: rgba(0,0,0,0.4); 
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto; 
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%; 
   border-radius: 10px;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-/* ... 나머지 스타일 ... */
-
-
-.login-container {
-  text-align: left;
-}
-
-.login-container h2 {
-  font-size: 24px;
-  margin-top: 0;
-  color: #003366;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
@@ -197,19 +66,19 @@ header {
   display: block;
   margin-bottom: 5px;
   font-size: 18px;
-  color: #003366;
+  color: #333;
 }
 
+.form-group select,
 .form-group input {
-  width: calc(100% - 20px);
+  width: 100%;
   padding: 10px;
-  margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
 }
 
-button {
+.styled-button {
   width: 100%;
   padding: 15px;
   background-color: #003366;
@@ -220,38 +89,30 @@ button {
   font-size: 18px;
 }
 
-button:hover {
+.styled-button:hover {
   background-color: #002244;
 }
 
-#message {
-  margin-top: 15px;
-  text-align: center;
-  font-size: 16px;
-}
-
-/* 이전 스타일 유지 */
-
+/* 좌석 선택 모달 스타일 */
 .modal {
-  display: none; 
-  position: fixed; 
-  z-index: 1; 
+  display: none;
+  position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  overflow: auto; 
-  background-color: rgb(0,0,0); 
-  background-color: rgba(0,0,0,0.4); 
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
   background-color: #fefefe;
-  margin: 15% auto; 
+  margin: 5% auto;
   padding: 20px;
   border: 1px solid #888;
   width: 80%;
-  max-width: 400px;
+  max-width: 800px;
   border-radius: 10px;
 }
 
@@ -269,45 +130,58 @@ button:hover {
   cursor: pointer;
 }
 
-#login-form,
-#register-form {
+.seat-selection-container {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
-#login-form .form-group,
-#register-form .form-group {
-  margin-bottom: 15px;
+.bus {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) 1fr repeat(4, 1fr);
+  grid-gap: 10px;
 }
 
-#login-form label,
-#register-form label {
-  margin-bottom: 5px;
+.row {
+  display: contents;
 }
 
-#login-form input,
-#register-form input {
-  padding: 10px;
+.seat {
+  background-color: #f1f1f1;
   border: 1px solid #ccc;
   border-radius: 5px;
-}
-
-#login-form button,
-#register-form button {
   padding: 10px;
-  background-color: #003366;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  text-align: center;
   cursor: pointer;
 }
 
-#login-form button:hover,
-#register-form button:hover {
-  background-color: #002244;
+.seat:hover {
+  background-color: #ddd;
 }
 
-#login-message,
-#register-message {
-  margin-top: 10px;
+.seat.selected {
+  background-color: #6c7ae0;
+  color: white;
+}
+
+.seat.reserved {
+  background-color: #e06c6c;
+  cursor: not-allowed;
+}
+
+.passage {
+  width: 20px;
+}
+
+.seat-selection-info {
+  text-align: center;
+}
+
+.seat-selection-info h3 {
+  margin-top: 0;
+}
+
+.seat-selection-info p {
+  font-size: 20px;
+  margin: 10px 0;
 }
