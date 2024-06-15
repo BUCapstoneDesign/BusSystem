@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const seats = document.querySelectorAll('.seat');
     let selectedSeat = null;
     let reservedSeats = [];
+    let userReservedSeats = [];
 
     // 요일을 반환하는 함수
     function getDayOfWeek(date) {
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 좌석 선택 로직
     seats.forEach(seat => {
         seat.addEventListener('click', () => {
-            if (!seat.classList.contains('reserved')) {
+            if (!seat.classList.contains('reserved') && !seat.classList.contains('user-reserved')) {
                 if (selectedSeat) {
                     selectedSeat.classList.remove('selected');
                 }
@@ -110,6 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = departureDateInput.value;
         const time = departureTimeInput.value;
         const seatNumber = selectedSeat.getAttribute('data-seat');
+
+        const dateObj = new Date(date);
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+
         fetch('/reserve-seat', {
             method: 'POST',
             headers: {
@@ -118,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({
                 departure,
                 arrival,
-                date,
+                date: formattedDate,
                 time,
                 seat_number: seatNumber
             })
@@ -144,9 +152,21 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 reservedSeats = data;
-                updateSeats();
+                fetchUserReservedSeats(); // 사용자 예약 좌석도 가져와야 함
             })
             .catch(error => console.error('Error fetching reserved seats:', error));
+    }
+
+    function fetchUserReservedSeats() {
+        fetch('/user-info')
+            .then(response => response.json())
+            .then(data => {
+                if (data.reservations) {
+                    userReservedSeats = data.reservations.map(reservation => reservation.seat_number);
+                    updateSeats();
+                }
+            })
+            .catch(error => console.error('Error fetching user reserved seats:', error));
     }
 
     // 좌석 UI 업데이트
@@ -157,8 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 seat.classList.add('reserved');
                 seat.classList.remove('selected');
                 seat.removeEventListener('click', selectSeat);
+            } else if (userReservedSeats.includes(seatNumber)) {
+                seat.classList.add('user-reserved');
+                seat.classList.remove('selected');
+                seat.removeEventListener('click', selectSeat);
             } else {
-                seat.classList.remove('reserved');
+                seat.classList.remove('reserved', 'user-reserved');
                 seat.addEventListener('click', selectSeat);
             }
         });
@@ -166,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 좌석 선택 함수
     function selectSeat() {
-        if (!this.classList.contains('reserved')) {
+        if (!this.classList.contains('reserved') && !this.classList.contains('user-reserved')) {
             if (selectedSeat) {
                 selectedSeat.classList.remove('selected');
             }
@@ -195,7 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     data.reservations.forEach(reservation => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `${reservation.Buslocation} - ${formatDate(reservation.reservation_date)} - ${reservation.reservation_time} - ${reservation.seat_number}`;
+                        const formattedDate = formatDate(reservation.reservation_date);
+                        listItem.textContent = `${reservation.Buslocation} - ${formattedDate} - ${reservation.reservation_time} - ${reservation.seat_number}`;
                         const cancelButton = document.createElement('button');
                         cancelButton.textContent = '취소';
                         addCancelHandler(cancelButton, reservation.reservation_id);
@@ -221,6 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 alert('예약이 취소되었습니다.');
                 fetchReservations(); // 예약 목록을 새로 고침
+                fetchReservedSeats(); // 좌석 상태를 새로 고침
             } else {
                 alert(`예약 취소 실패: ${result.message}`);
             }

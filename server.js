@@ -6,6 +6,7 @@ const MySQLStore = require('express-mysql-session')(session);
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
+const QRCode = require('qrcode');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 8080;
@@ -101,7 +102,7 @@ app.post('/login', (req, res) => {
                     if (err) return res.json({ success: false, message: '서버 오류' });
                     if (result) {
                         req.session.loggedin = true;
-                        req.session.student_id = results[0].id; // 세션에 student_id 저장
+                        req.session.Studentsid = results[0].Studentsid; // 세션에 Studentsid 저장
                         req.session.student_number = student_number;
                         req.session.loginTime = new Date();
                         res.json({ success: true, student_number: student_number });
@@ -115,6 +116,43 @@ app.post('/login', (req, res) => {
         });
     } else {
         res.json({ success: false, message: '모든 필드를 입력하세요' });
+    }
+});
+
+// QR 생성
+app.post('/generate-qr', (req, res) => {
+    if (req.session.loggedin) {
+        const { reservationId } = req.body;
+
+        // 예약 정보를 DB에서 조회
+        const query = `
+            SELECT r.reservation_id, r.seat_number, DATE_FORMAT(r.reservation_date, '%Y-%m-%d') as reservation_date, r.reservation_time, s.Buslocation
+            FROM reservations r
+            JOIN Bus s ON r.busid = s.Busid
+            WHERE r.reservation_id = ? AND r.Studentsid = ?
+        `;
+
+        db.query(query, [reservationId, req.session.Studentsid], (err, results) => {
+            if (err) return res.json({ success: false, message: '예약 조회 실패' });
+
+            if (results.length === 0) {
+                return res.json({ success: false, message: '해당 예약을 찾을 수 없습니다' });
+            }
+
+            const reservation = results[0];
+            const qrData = `Departure: ${reservation.Buslocation}\nDate: ${reservation.reservation_date}\nTime: ${reservation.reservation_time}\nSeat: ${reservation.seat_number}`;
+
+            QRCode.toDataURL(qrData, (err, url) => {
+                if (err) {
+                    console.error('QR 코드 생성 실패:', err);
+                    return res.json({ success: false, message: 'QR 코드 생성 실패' });
+                }
+
+                res.json({ success: true, qrCode: url });
+            });
+        });
+    } else {
+        res.json({ success: false, message: '로그인 필요' });
     }
 });
 
@@ -145,12 +183,12 @@ app.get('/reservation', (req, res) => {
 app.get('/user-info', (req, res) => {
     if (req.session.loggedin) {
         const query = `
-            SELECT r.reservation_id, r.seat_number, r.reservation_date, r.reservation_time, s.Buslocation
+            SELECT r.reservation_id, r.seat_number, DATE_FORMAT(r.reservation_date, '%Y-%m-%d') as reservation_date, r.reservation_time, s.Buslocation
             FROM reservations r
             JOIN Bus s ON r.busid = s.Busid
-            WHERE r.student_id = ?
+            WHERE r.Studentsid = ?
         `;
-        db.query(query, [req.session.student_id], (err, results) => {
+        db.query(query, [req.session.Studentsid], (err, results) => {
             if (err) throw err;
             res.json({
                 student_number: req.session.student_number,
@@ -159,7 +197,7 @@ app.get('/user-info', (req, res) => {
             });
         });
     } else {
-        res.json({ error: '로그인 필요' });
+        res.json({});
     }
 });
 
@@ -167,13 +205,18 @@ app.get('/user-info', (req, res) => {
 app.post('/reserve-seat', (req, res) => {
     if (req.session.loggedin) {
         const { departure, date, time, seat_number } = req.body;
-        const student_id = req.session.student_id;
+        const Studentsid = req.session.Studentsid;
 
-        // 버스를 조회하는 쿼리
         const busQuery = 'SELECT Busid FROM Bus WHERE Buslocation = ? AND Busday = ? AND Bustime = ?';
 
         const dateObj = new Date(date);
-        const dayName = getKoreanDayName(dateObj);  // 요일 이름 변환
+        const year = dateObj.getFullYear(); // 연도 가져오기
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // 월 가져오기
+        const day = String(dateObj.getDate()).padStart(2, '0'); // 일 가져오기
+
+        const formattedDate = `${year}-${month}-${day}`; // YYYY-MM-DD 형식으로 변환
+
+        const dayName = getKoreanDayName(dateObj);
 
         db.query(busQuery, [departure, dayName, time], (err, results) => {
             if (err) return res.json({ success: false, message: '버스 조회 실패' });
@@ -184,30 +227,33 @@ app.post('/reserve-seat', (req, res) => {
 
             const busid = results[0].Busid;
 
-            // 중복 예약 확인 쿼리
-            const checkDuplicateQuery = 'SELECT * FROM reservations WHERE student_id = ? AND busid = ? AND seat_number = ? AND reservation_date = ? AND reservation_time = ?';
-            db.query(checkDuplicateQuery, [student_id, busid, seat_number, date, time], (err, duplicateResults) => {
+            const checkDuplicateQuery = 'SELECT * FROM reservations WHERE busid = ? AND seat_number = ? AND reservation_date = ? AND reservation_time = ?';
+            db.query(checkDuplicateQuery, [busid, seat_number, formattedDate, time], (err, duplicateResults) => {
                 if (err) return res.json({ success: false, message: '중복 예약 확인 실패' });
 
                 if (duplicateResults.length > 0) {
                     return res.json({ success: false, message: '이미 예약된 좌석입니다' });
                 }
 
-                // 예약을 저장하는 쿼리
                 db.query(
-                    'INSERT INTO reservations (student_id, busid, seat_number, reservation_date, reservation_time) VALUES (?, ?, ?, ?, ?)',
-                    [student_id, busid, seat_number, date, time],
+                    'INSERT INTO reservations (Studentsid, busid, seat_number, reservation_date, reservation_time) VALUES (?, ?, ?, ?, ?)',
+                    [Studentsid, busid, seat_number, formattedDate, time],
                     (err, result) => {
-                        if (err) return res.json({ success: false, message: '예약 실패' });
+                        if (err) {
+                            console.error('예약 실패:', err);
+                            return res.json({ success: false, message: '예약 실패' });
+                        }
+                        console.log('예약된 날짜:', formattedDate); // 추가된 로그
                         res.json({ success: true, message: '좌석 예약 성공' });
                     }
-                );
+                );  
             });
         });
     } else {
         res.json({ success: false, message: '로그인 필요' });
     }
 });
+
 
 // 예약된 좌석 조회
 app.get('/reserved-seats', (req, res) => {
@@ -223,8 +269,8 @@ app.get('/reserved-seats', (req, res) => {
 app.post('/cancel-reservation', (req, res) => {
     if (req.session.loggedin) {
         const { reservation_id } = req.body;
-        const student_id = req.session.student_id;
-        db.query('DELETE FROM reservations WHERE reservation_id = ? AND student_id = ?', [reservation_id, student_id], (err, result) => {
+        const Studentsid = req.session.Studentsid;
+        db.query('DELETE FROM reservations WHERE reservation_id = ? AND Studentsid = ?', [reservation_id, Studentsid], (err, result) => {
             if (err) {
                 console.error('예약 취소 실패:', err);
                 return res.json({ success: false, message: '예약 취소 실패' });

@@ -164,6 +164,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
+    // qr 관련
+    function fetchReservations() {
+        fetch('/user-info')
+            .then(response => response.json())
+            .then(data => {
+                if (data.reservations) {
+                    const reservationList = document.getElementById('reservation-list');
+                    reservationList.innerHTML = ''; // 기존 예약 목록 초기화
+    
+                    data.reservations.forEach(reservation => {
+                        const listItem = document.createElement('li');
+                        const formattedDate = formatDate(reservation.reservation_date);
+                        listItem.innerHTML = `${reservation.Buslocation} - ${formattedDate} - ${reservation.reservation_time} - ${reservation.seat_number}`;
+                        
+                        // QR 코드 생성 버튼 추가
+                        const qrButton = document.createElement('button');
+                        qrButton.textContent = 'QR 코드 생성';
+                        qrButton.addEventListener('click', () => generateQRCode(reservation.reservation_id));
+                        listItem.appendChild(qrButton);
+                        
+                        const cancelButton = document.createElement('button');
+                        cancelButton.textContent = '취소';
+                        addCancelHandler(cancelButton, reservation.reservation_id);
+                        listItem.appendChild(cancelButton);
+                        
+                        reservationList.appendChild(listItem);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching reservations:', error));
+    }
+    
+    // QR 코드 생성 함수
+    function generateQRCode(reservationId) {
+        fetch('/generate-qr', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reservationId })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                const qrCodeImage = document.createElement('img');
+                qrCodeImage.src = result.qrCode;
+                const qrCodeContainer = document.createElement('div');
+                qrCodeContainer.appendChild(qrCodeImage);
+                document.body.appendChild(qrCodeContainer);
+            } else {
+                alert(`QR 코드 생성 실패: ${result.message}`);
+            }
+        })
+        .catch(error => console.error('Error generating QR code:', error));
+    }
+    
+
     // Handle seat selection
     seats.forEach(seat => {
         seat.addEventListener('click', () => {
