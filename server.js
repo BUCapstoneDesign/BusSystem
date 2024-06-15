@@ -219,7 +219,10 @@ app.post('/reserve-seat', (req, res) => {
         const dayName = getKoreanDayName(dateObj);
 
         db.query(busQuery, [departure, dayName, time], (err, results) => {
-            if (err) return res.json({ success: false, message: '버스 조회 실패' });
+            if (err) {
+                console.error('버스 조회 실패:', err);
+                return res.json({ success: false, message: '버스 조회 실패' });
+            }
 
             if (results.length === 0) {
                 return res.json({ success: false, message: '해당 조건에 맞는 버스를 찾을 수 없습니다' });
@@ -227,11 +230,17 @@ app.post('/reserve-seat', (req, res) => {
 
             const busid = results[0].Busid;
 
+            console.log('버스 ID:', busid); // 추가된 로그
+
             const checkDuplicateQuery = 'SELECT * FROM reservations WHERE busid = ? AND seat_number = ? AND reservation_date = ? AND reservation_time = ?';
             db.query(checkDuplicateQuery, [busid, seat_number, formattedDate, time], (err, duplicateResults) => {
-                if (err) return res.json({ success: false, message: '중복 예약 확인 실패' });
+                if (err) {
+                    console.error('중복 예약 확인 실패:', err);
+                    return res.json({ success: false, message: '중복 예약 확인 실패' });
+                }
 
                 if (duplicateResults.length > 0) {
+                    console.log('이미 예약된 좌석입니다:', duplicateResults); // 추가된 로그
                     return res.json({ success: false, message: '이미 예약된 좌석입니다' });
                 }
 
@@ -253,6 +262,7 @@ app.post('/reserve-seat', (req, res) => {
         res.json({ success: false, message: '로그인 필요' });
     }
 });
+
 
 // 예약된 좌석 조회
 app.get('/reserved-seats', (req, res) => {
