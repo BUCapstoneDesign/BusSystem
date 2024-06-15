@@ -117,14 +117,7 @@
         </div>
     </div>
 
-    <!-- BusTimeTable 팝업 -->
-    <div id="timetable-modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <img src="BusTimeTable.png" alt="전체 시간표">
-        </div>
-    </div>
-
+    <!-- BusTimeTable 팝업 제거 -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -197,21 +190,9 @@
                 .catch(error => console.error('Error during cancellation:', error));
             }
 
-            // 팝업 열기 함수
+            // 새 탭에서 이미지 열기 함수
             window.openBusTimetable = function () {
-                const modal = document.getElementById('timetable-modal');
-                modal.style.display = 'block';
-
-                const closeBtn = document.getElementsByClassName('close')[0];
-                closeBtn.onclick = function() {
-                    modal.style.display = 'none';
-                };
-
-                window.onclick = function(event) {
-                    if (event.target == modal) {
-                        modal.style.display = 'none';
-                    }
-                };
+                window.open('BusTimeTable.png', '_blank');
             };
         });
     </script>
