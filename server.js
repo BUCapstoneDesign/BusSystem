@@ -257,12 +257,14 @@ app.post('/reserve-seat', (req, res) => {
 // 예약된 좌석 조회
 app.get('/reserved-seats', (req, res) => {
     const { reservation_date, reservation_time } = req.query;
+    const formattedDate = new Date(reservation_date).toISOString().split('T')[0];
     db.query('SELECT seat_number FROM reservations WHERE reservation_date = ? AND reservation_time = ?',
-        [reservation_date, reservation_time], (err, results) => {
+        [formattedDate, reservation_time], (err, results) => {
         if (err) throw err;
         res.json(results.map(row => row.seat_number));
     });
 });
+
 
 // 좌석 예약 취소 처리
 app.post('/cancel-reservation', (req, res) => {
