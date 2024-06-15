@@ -164,6 +164,7 @@ app.get('/user-info', (req, res) => {
 });
 
 // 좌석 예약 처리
+// 좌석 예약 처리
 app.post('/reserve-seat', (req, res) => {
     if (req.session.loggedin) {
         const { departure, date, time, seat_number } = req.body;
@@ -172,6 +173,12 @@ app.post('/reserve-seat', (req, res) => {
         const busQuery = 'SELECT Busid FROM Bus WHERE Buslocation = ? AND Busday = ? AND Bustime = ?';
 
         const dateObj = new Date(date);
+        const year = dateObj.getFullYear(); // 연도 가져오기
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // 월 가져오기
+        const day = String(dateObj.getDate()).padStart(2, '0'); // 일 가져오기
+
+        const formattedDate = `${year}-${month}-${day}`; // YYYY-MM-DD 형식으로 변환
+
         const dayName = getKoreanDayName(dateObj);
 
         db.query(busQuery, [departure, dayName, time], (err, results) => {
@@ -184,7 +191,7 @@ app.post('/reserve-seat', (req, res) => {
             const busid = results[0].Busid;
 
             const checkDuplicateQuery = 'SELECT * FROM reservations WHERE busid = ? AND seat_number = ? AND reservation_date = ? AND reservation_time = ?';
-            db.query(checkDuplicateQuery, [busid, seat_number, date, time], (err, duplicateResults) => {
+            db.query(checkDuplicateQuery, [busid, seat_number, formattedDate, time], (err, duplicateResults) => {
                 if (err) return res.json({ success: false, message: '중복 예약 확인 실패' });
 
                 if (duplicateResults.length > 0) {
@@ -193,13 +200,13 @@ app.post('/reserve-seat', (req, res) => {
 
                 db.query(
                     'INSERT INTO reservations (Studentsid, busid, seat_number, reservation_date, reservation_time) VALUES (?, ?, ?, ?, ?)',
-                    [Studentsid, busid, seat_number, date, time],
+                    [Studentsid, busid, seat_number, formattedDate, time],
                     (err, result) => {
                         if (err) {
                             console.error('예약 실패:', err);
                             return res.json({ success: false, message: '예약 실패' });
                         }
-                        console.log('예약된 날짜:', date); // 추가된 로그
+                        console.log('예약된 날짜:', formattedDate); // 추가된 로그
                         res.json({ success: true, message: '좌석 예약 성공' });
                     }
                 );  
@@ -209,6 +216,7 @@ app.post('/reserve-seat', (req, res) => {
         res.json({ success: false, message: '로그인 필요' });
     }
 });
+
 
 // 예약된 좌석 조회
 app.get('/reserved-seats', (req, res) => {

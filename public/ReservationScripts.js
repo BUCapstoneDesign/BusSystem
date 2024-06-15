@@ -111,10 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = departureDateInput.value;
         const time = departureTimeInput.value;
         const seatNumber = selectedSeat.getAttribute('data-seat');
-        
-        // 여기서 date 값을 로그로 확인
-        console.log('예약 날짜:', date);
-    
+
+        const dateObj = new Date(date);
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+
         fetch('/reserve-seat', {
             method: 'POST',
             headers: {
@@ -123,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({
                 departure,
                 arrival,
-                date,
+                date: formattedDate,
                 time,
                 seat_number: seatNumber
             })
@@ -140,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error during reservation:', error));
     });
-    
+
     // 예약된 좌석을 가져오는 함수
     function fetchReservedSeats() {
         const reservationDate = departureDateInput.value;
@@ -216,7 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     data.reservations.forEach(reservation => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `${reservation.Buslocation} - ${formatDate(reservation.reservation_date)} - ${reservation.reservation_time} - ${reservation.seat_number}`;
+                        const formattedDate = formatDate(reservation.reservation_date);
+                        listItem.textContent = `${reservation.Buslocation} - ${formattedDate} - ${reservation.reservation_time} - ${reservation.seat_number}`;
                         const cancelButton = document.createElement('button');
                         cancelButton.textContent = '취소';
                         addCancelHandler(cancelButton, reservation.reservation_id);
