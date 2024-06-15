@@ -6,6 +6,7 @@ const MySQLStore = require('express-mysql-session')(session);
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
+const QRCode = require('qrcode');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 8080;
@@ -118,6 +119,43 @@ app.post('/login', (req, res) => {
     }
 });
 
+// QR 생성
+app.post('/generate-qr', (req, res) => {
+    if (req.session.loggedin) {
+        const { reservationId } = req.body;
+
+        // 예약 정보를 DB에서 조회
+        const query = `
+            SELECT r.reservation_id, r.seat_number, DATE_FORMAT(r.reservation_date, '%Y-%m-%d') as reservation_date, r.reservation_time, s.Buslocation
+            FROM reservations r
+            JOIN Bus s ON r.busid = s.Busid
+            WHERE r.reservation_id = ? AND r.Studentsid = ?
+        `;
+
+        db.query(query, [reservationId, req.session.Studentsid], (err, results) => {
+            if (err) return res.json({ success: false, message: '예약 조회 실패' });
+
+            if (results.length === 0) {
+                return res.json({ success: false, message: '해당 예약을 찾을 수 없습니다' });
+            }
+
+            const reservation = results[0];
+            const qrData = `Departure: ${reservation.Buslocation}\nDate: ${reservation.reservation_date}\nTime: ${reservation.reservation_time}\nSeat: ${reservation.seat_number}`;
+
+            QRCode.toDataURL(qrData, (err, url) => {
+                if (err) {
+                    console.error('QR 코드 생성 실패:', err);
+                    return res.json({ success: false, message: 'QR 코드 생성 실패' });
+                }
+
+                res.json({ success: true, qrCode: url });
+            });
+        });
+    } else {
+        res.json({ success: false, message: '로그인 필요' });
+    }
+});
+
 // 로그인 상태 확인 및 학번 반환
 app.get('/check-login-status', (req, res) => {
     if (req.session.loggedin) {
@@ -163,7 +201,6 @@ app.get('/user-info', (req, res) => {
     }
 });
 
-// 좌석 예약 처리
 // 좌석 예약 처리
 app.post('/reserve-seat', (req, res) => {
     if (req.session.loggedin) {

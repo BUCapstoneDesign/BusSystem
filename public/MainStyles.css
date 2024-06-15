@@ -223,6 +223,21 @@ header {
   }
 }
 
+/* qr 관련 */
+.qr-code-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.qr-code-container img {
+  max-width: 200px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 10px;
+}
+
 
 /* ... 나머지 스타일 ... */
 

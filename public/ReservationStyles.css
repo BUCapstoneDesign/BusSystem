@@ -165,7 +165,7 @@ header {
 }
 
 .seat.user-reserved {
-  background-color: #f39c12;
+  background-color: #b3720b;
   color: white;
   cursor: not-allowed;
 }
